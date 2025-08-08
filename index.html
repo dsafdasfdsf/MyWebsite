@@ -1,90 +1,244 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" >
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Simple Money Game</title>
-<style>
-  body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: #f0f2f5;
-    margin: 0; padding: 0;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    min-height: 100vh;
-    color: #222;
-  }
-  header {
-    width: 100%;
-    background: white;
-    padding: 12px 20px;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-    display: flex;
-    justify-content: flex-end;
-    gap: 10px;
-  }
-  button {
-    background: #4caf50;
-    border: none;
-    padding: 8px 16px;
-    border-radius: 20px;
-    color: white;
-    font-weight: 600;
-    cursor: pointer;
-    transition: background 0.3s ease;
-  }
-  button:hover {
-    background: #45a045;
-  }
-  main {
-    background: white;
-    margin-top: 40px;
-    padding: 30px 40px;
-    border-radius: 15px;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
-    width: 320px;
-    text-align: center;
-  }
-  input {
-    padding: 8px 12px;
-    border-radius: 12px;
-    border: 1px solid #ccc;
-    width: 100%;
-    margin: 8px 0 16px;
-    font-size: 1rem;
-    outline-offset: 2px;
-    transition: border-color 0.25s ease;
-  }
-  input:focus {
-    border-color: #4caf50;
-  }
-  #moneyDisplay {
-    font-size: 1.5rem;
-    margin-top: 20px;
-    font-weight: 700;
-    color: #4caf50;
-  }
-  #log {
-    margin-top: 25px;
-    height: 120px;
-    overflow-y: auto;
-    background: #e8f5e9;
-    border-radius: 12px;
-    padding: 10px;
-    font-size: 0.9rem;
-    text-align: left;
-    box-shadow: inset 0 0 5px rgba(76,175,80,0.3);
-  }
-  #log div {
-    margin-bottom: 6px;
-    animation: fadeIn 0.5s ease forwards;
-  }
-  @keyframes fadeIn {
-    from {opacity: 0; transform: translateY(10px);}
-    to {opacity: 1; transform: translateY(0);}
-  }
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Money Game + Ban + Shop + Cats</title>
+  <style>
+    /* Reset */
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      margin: 0; padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #fafafa;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      color: #222;
+      user-select: none;
+      overflow-x: hidden;
+    }
+    header {
+      width: 100%;
+      background: white;
+      padding: 14px 0;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+      display: flex;
+      justify-content: center;
+      gap: 14px;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    button {
+      background: #4caf50;
+      border: none;
+      padding: 10px 18px;
+      border-radius: 24px;
+      color: white;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.3s ease;
+      font-size: 1rem;
+      box-shadow: 0 3px 8px rgb(76 175 80 / 0.4);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    button:hover:not(:disabled) {
+      background: #43a047;
+      box-shadow: 0 5px 12px rgb(67 160 71 / 0.7);
+    }
+    button:disabled {
+      background: #9e9e9e;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+    main {
+      margin-top: 40px;
+      width: 960px;
+      max-width: 95vw;
+      display: grid;
+      grid-template-columns: 320px 1fr;
+      gap: 28px;
+      padding-bottom: 60px;
+    }
+    #authForm, #gamePanel {
+      background: white;
+      padding: 30px 30px 36px;
+      border-radius: 18px;
+      box-shadow: 0 10px 25px rgb(0 0 0 / 0.05);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      animation: fadeIn 0.5s ease forwards;
+    }
+    #authForm input {
+      padding: 12px 14px;
+      border-radius: 16px;
+      border: 1.8px solid #ccc;
+      width: 100%;
+      font-size: 1rem;
+      margin-bottom: 18px;
+      transition: border-color 0.3s ease;
+      outline-offset: 2px;
+    }
+    #authForm input:focus {
+      border-color: #4caf50;
+    }
+    #authForm button {
+      width: 100%;
+      margin-top: 10px;
+      font-size: 1.1rem;
+      box-shadow: 0 5px 15px rgb(76 175 80 / 0.4);
+    }
+    #welcomeMsg {
+      font-weight: 700;
+      font-size: 1.3rem;
+      margin-bottom: 14px;
+      user-select: text;
+    }
+    #moneyDisplay {
+      font-size: 1.6rem;
+      font-weight: 700;
+      margin-bottom: 14px;
+      color: #4caf50;
+      user-select: text;
+    }
+    #countdown {
+      font-size: 1.1rem;
+      margin-bottom: 18px;
+      color: #555;
+    }
+    #log, #playersList, #shop {
+      background: #f7fefa;
+      border-radius: 14px;
+      padding: 14px 16px;
+      box-shadow: inset 0 0 12px rgb(76 175 80 / 0.15);
+      overflow-y: auto;
+      max-height: 200px;
+      user-select: none;
+      font-size: 0.9rem;
+    }
+    #log {
+      margin-top: 20px;
+      height: 180px;
+      color: #2e7d32;
+      font-weight: 500;
+    }
+    #log div {
+      margin-bottom: 6px;
+      opacity: 0;
+      animation: fadeInUp 0.4s forwards;
+    }
+    #playersList {
+      max-height: 320px;
+      margin-bottom: 16px;
+      font-weight: 600;
+      color: #2e7d32;
+      user-select: text;
+    }
+    #playersList div {
+      padding: 8px 10px;
+      border-radius: 12px;
+      margin-bottom: 6px;
+      background: #c8e6c9;
+      box-shadow: 0 3px 8px rgb(76 175 80 / 0.3);
+      cursor: default;
+      transition: background 0.25s ease;
+    }
+    #playersList div.selected {
+      background: #81c784;
+      font-weight: 700;
+      color: white;
+      box-shadow: 0 4px 12px rgb(56 142 60 / 0.7);
+    }
+    #playersList div:hover:not(.selected) {
+      background: #a5d6a7;
+    }
+    #banBtn {
+      margin-top: 6px;
+      background: #e53935;
+      box-shadow: 0 3px 8px rgb(229 57 53 / 0.6);
+      font-weight: 700;
+    }
+    #banBtn:hover:not(:disabled) {
+      background: #b71c1c;
+      box-shadow: 0 5px 15px rgb(183 28 28 / 0.8);
+    }
+    #banBtn:disabled {
+      cursor: not-allowed;
+      background: #ef9a9a;
+      box-shadow: none;
+    }
+    #shop {
+      max-height: 180px;
+      font-weight: 600;
+      color: #2e7d32;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    #shop button {
+      background: #388e3c;
+      box-shadow: 0 3px 8px rgb(56 142 60 / 0.5);
+      font-weight: 700;
+      font-size: 1rem;
+      padding: 8px 14px;
+      border-radius: 14px;
+      transition: background 0.3s ease;
+      width: 100%;
+    }
+    #shop button:hover:not(:disabled) {
+      background: #2e7d32;
+      box-shadow: 0 5px 15px rgb(46 115 50 / 0.8);
+    }
+    #shop button:disabled {
+      cursor: not-allowed;
+      background: #a5d6a7;
+      box-shadow: none;
+    }
+    #cats {
+      grid-column: span 2;
+      margin-top: 40px;
+      user-select: none;
+      display: flex;
+      justify-content: center;
+      gap: 24px;
+      flex-wrap: wrap;
+    }
+    #cats img {
+      width: 160px;
+      height: 120px;
+      border-radius: 18px;
+      box-shadow: 0 8px 20px rgb(0 0 0 / 0.1);
+      object-fit: cover;
+      transform: scale(0.95);
+      animation: float 4s ease-in-out infinite;
+      cursor: default;
+      transition: transform 0.3s ease;
+    }
+    #cats img:hover {
+      transform: scale(1.1) rotate(5deg);
+      box-shadow: 0 12px 32px rgb(0 0 0 / 0.2);
+    }
+    /* Animations */
+    @keyframes fadeIn {
+      from {opacity: 0;}
+      to {opacity: 1;}
+    }
+    @keyframes fadeInUp {
+      from {opacity: 0; transform: translateY(8px);}
+      to {opacity: 1; transform: translateY(0);}
+    }
+    @keyframes float {
+      0%, 100% {transform: translateY(0) scale(0.95);}
+      50% {transform: translateY(-12px) scale(1);}
+    }
+  </style>
 </head>
 <body>
 
@@ -95,21 +249,43 @@
 </header>
 
 <main>
-  <div id="authForm">
+  <section id="authForm">
     <input id="username" placeholder="Username" autocomplete="off" />
     <input id="password" type="password" placeholder="Password" autocomplete="off" />
     <button id="submitBtn">Log In</button>
-  </div>
+  </section>
 
-  <div id="game" style="display:none;">
-    <div id="welcomeMsg" style="font-weight:bold; font-size:1.2rem;"></div>
+  <section id="gamePanel" style="display:none;">
+
+    <div id="welcomeMsg"></div>
     <div id="moneyDisplay">Money: $0</div>
-    <div id="log"></div>
-  </div>
+    <div id="countdown">Next $1 in: 30 seconds</div>
+
+    <div id="playersList" title="Click to select a player (admin only)"></div>
+    <button id="banBtn" disabled>Ban Selected Player</button>
+
+    <div id="shop">
+      <div><b>Shop</b></div>
+      <button data-price="5" data-item="Cool Hat">Buy Cool Hat ($5)</button>
+      <button data-price="12" data-item="Magic Sword">Buy Magic Sword ($12)</button>
+      <button data-price="30" data-item="Golden Crown">Buy Golden Crown ($30)</button>
+    </div>
+
+    <div id="log" title="Logs"></div>
+  </section>
 </main>
+
+<section id="cats">
+  <img src="https://cdn2.thecatapi.com/images/MTY3ODIyMQ.jpg" alt="Cat 1" />
+  <img src="https://cdn2.thecatapi.com/images/MTU3ODIyMQ.jpg" alt="Cat 2" />
+  <img src="https://cdn2.thecatapi.com/images/MTY3OTIyNA.jpg" alt="Cat 3" />
+  <img src="https://cdn2.thecatapi.com/images/MTY3ODIyMg.jpg" alt="Cat 4" />
+  <img src="https://cdn2.thecatapi.com/images/MTY3ODIyMw.jpg" alt="Cat 5" />
+</section>
 
 <script>
 (() => {
+  // Elements
   const loginBtn = document.getElementById('loginBtn');
   const signupBtn = document.getElementById('signupBtn');
   const logoutBtn = document.getElementById('logoutBtn');
@@ -117,96 +293,202 @@
   const submitBtn = document.getElementById('submitBtn');
   const usernameInput = document.getElementById('username');
   const passwordInput = document.getElementById('password');
-  const gameDiv = document.getElementById('game');
-  const moneyDisplay = document.getElementById('moneyDisplay');
-  const logDiv = document.getElementById('log');
+  const gamePanel = document.getElementById('gamePanel');
   const welcomeMsg = document.getElementById('welcomeMsg');
+  const moneyDisplay = document.getElementById('moneyDisplay');
+  const countdown = document.getElementById('countdown');
+  const logDiv = document.getElementById('log');
+  const playersList = document.getElementById('playersList');
+  const banBtn = document.getElementById('banBtn');
+  const shop = document.getElementById('shop');
 
+  // Hardcoded users & banned storage keys
+  const STORAGE_USERS = 'moneyGameUsers_v1';
+  const STORAGE_BANNED = 'moneyGameBanned_v1';
+
+  // Defaults
+  let users = {
+    cow: { password: 'cow', money: 0, items: [] },
+    admin: { password: 'admin', money: 1000, items: [] },
+  };
+  let bannedPlayers = [];
+
+  // Load from localStorage
+  function loadStorage() {
+    const storedUsers = localStorage.getItem(STORAGE_USERS);
+    const storedBanned = localStorage.getItem(STORAGE_BANNED);
+    if (storedUsers) {
+      try {
+        users = JSON.parse(storedUsers);
+      } catch {}
+    }
+    if (storedBanned) {
+      try {
+        bannedPlayers = JSON.parse(storedBanned);
+      } catch {}
+    }
+  }
+  function saveStorage() {
+    localStorage.setItem(STORAGE_USERS, JSON.stringify(users));
+    localStorage.setItem(STORAGE_BANNED, JSON.stringify(bannedPlayers));
+  }
+
+  // Variables
   let currentUser = null;
   let money = 0;
   let moneyInterval = null;
-  let isSignupMode = false;
+  let secondTimer = null;
+  let nextSecond = 30;
+  let selectedPlayer = null;
   let logs = [];
 
-  // Hardcoded user data
-  // Default user: cow/cow
-  let users = {
-    cow: { password: 'cow', money: 0 }
-  };
-
-  // Helpers
+  // Log helper
   function log(msg) {
     const time = new Date().toLocaleTimeString();
     logs.push(`[${time}] ${msg}`);
-    if (logs.length > 20) logs.shift();
+    if (logs.length > 30) logs.shift();
     logDiv.innerHTML = logs.map(l => `<div>${l}</div>`).join('');
     logDiv.scrollTop = logDiv.scrollHeight;
   }
 
-  function updateMoneyDisplay() {
+  // Update money display
+  function updateMoney() {
     moneyDisplay.textContent = `Money: $${money}`;
   }
 
-  function startMoneyTimer() {
+  // Update countdown display
+  function updateCountdown() {
+    countdown.textContent = `Next $1 in: ${nextSecond} second${nextSecond !== 1 ? 's' : ''}`;
+  }
+
+  // Start money timer + countdown
+  function startMoneyTimers() {
     if (moneyInterval) clearInterval(moneyInterval);
+    if (secondTimer) clearInterval(secondTimer);
+
+    nextSecond = 30;
+    updateCountdown();
+
+    secondTimer = setInterval(() => {
+      nextSecond--;
+      if (nextSecond <= 0) nextSecond = 30;
+      updateCountdown();
+    }, 1000);
+
     moneyInterval = setInterval(() => {
       money++;
       users[currentUser].money = money;
-      updateMoneyDisplay();
+      saveStorage();
+      updateMoney();
       log(`You earned $1! Total: $${money}`);
+      nextSecond = 30;
+      updateCountdown();
     }, 30000);
   }
 
-  function showAuthForm() {
-    authForm.style.display = 'block';
-    gameDiv.style.display = 'none';
-    logoutBtn.style.display = 'none';
-    submitBtn.textContent = 'Log In';
-    usernameInput.value = '';
-    passwordInput.value = '';
-    usernameInput.focus();
-    isSignupMode = false;
+  // Show players list
+  function renderPlayersList() {
+    playersList.innerHTML = '';
+    Object.keys(users).forEach(user => {
+      if (bannedPlayers.includes(user)) return; // skip banned in list
+      const div = document.createElement('div');
+      div.textContent = user + (user === currentUser ? " (You)" : "");
+      if (user === selectedPlayer) div.classList.add('selected');
+      div.title = users[user].items.length > 0 ? `Items: ${users[user].items.join(', ')}` : "No items";
+      div.onclick = () => {
+        if (currentUser !== 'admin') return;
+        if (user === currentUser) return; // can't select self
+        selectedPlayer = user;
+        renderPlayersList();
+        banBtn.disabled = !selectedPlayer;
+      };
+      playersList.appendChild(div);
+    });
   }
 
-  function showSignupForm() {
-    authForm.style.display = 'block';
-    gameDiv.style.display = 'none';
+  // Ban player function
+  function banSelectedPlayer() {
+    if (!selectedPlayer) return;
+    if (!confirm(`Are you sure you want to ban player "${selectedPlayer}"? This will log them out.`)) return;
+
+    bannedPlayers.push(selectedPlayer);
+    delete users[selectedPlayer];
+    saveStorage();
+    log(`Player "${selectedPlayer}" was banned by admin!`);
+    selectedPlayer = null;
+    banBtn.disabled = true;
+    renderPlayersList();
+  }
+
+  // Show auth form or game
+  function showAuth() {
+    authForm.style.display = 'flex';
+    gamePanel.style.display = 'none';
     logoutBtn.style.display = 'none';
-    submitBtn.textContent = 'Sign Up';
+    loginBtn.style.display = 'inline-flex';
+    signupBtn.style.display = 'inline-flex';
     usernameInput.value = '';
     passwordInput.value = '';
     usernameInput.focus();
-    isSignupMode = true;
+    selectedPlayer = null;
+    banBtn.disabled = true;
   }
 
   function showGame() {
     authForm.style.display = 'none';
-    gameDiv.style.display = 'block';
-    logoutBtn.style.display = 'inline-block';
+    gamePanel.style.display = 'flex';
+    logoutBtn.style.display = 'inline-flex';
+    loginBtn.style.display = 'none';
+    signupBtn.style.display = 'none';
     welcomeMsg.textContent = `Welcome, ${currentUser}!`;
     money = users[currentUser].money || 0;
-    updateMoneyDisplay();
+    updateMoney();
+    renderPlayersList();
+    banBtn.disabled = true;
+    if (currentUser === 'admin') {
+      banBtn.style.display = 'block';
+      playersList.title = 'Click to select a player (admin only)';
+    } else {
+      banBtn.style.display = 'none';
+      playersList.title = 'Player list';
+    }
+    startMoneyTimers();
+    logs = [];
     log(`Logged in as ${currentUser}`);
-    startMoneyTimer();
   }
 
-  // Events
-  loginBtn.onclick = () => showAuthForm();
-  signupBtn.onclick = () => showSignupForm();
+  // Login or Signup mode toggle
+  let isSignupMode = false;
 
+  // Event Listeners
+  loginBtn.onclick = () => {
+    isSignupMode = false;
+    submitBtn.textContent = 'Log In';
+    showAuth();
+  };
+  signupBtn.onclick = () => {
+    isSignupMode = true;
+    submitBtn.textContent = 'Sign Up';
+    showAuth();
+  };
   logoutBtn.onclick = () => {
-    currentUser = null;
     if (moneyInterval) clearInterval(moneyInterval);
-    logs = [];
+    if (secondTimer) clearInterval(secondTimer);
+    currentUser = null;
+    saveStorage();
+    showAuth();
     logDiv.innerHTML = '';
-    showAuthForm();
   };
 
   submitBtn.onclick = () => {
     const user = usernameInput.value.trim();
     const pass = passwordInput.value.trim();
     if (!user || !pass) {
-      alert('Enter username and password');
+      alert('Please enter username and password!');
+      return;
+    }
+    if (bannedPlayers.includes(user)) {
+      alert('This user is banned!');
       return;
     }
     if (isSignupMode) {
@@ -214,9 +496,14 @@
         alert('User already exists!');
         return;
       }
-      users[user] = { password: pass, money: 0 };
-      alert('Sign up successful! You can now log in.');
-      showAuthForm();
+      users[user] = { password: pass, money: 0, items: [] };
+      saveStorage();
+      alert('Sign up successful! Please log in.');
+      isSignupMode = false;
+      submitBtn.textContent = 'Log In';
+      usernameInput.value = '';
+      passwordInput.value = '';
+      usernameInput.focus();
       return;
     } else {
       if (!users[user]) {
@@ -232,8 +519,34 @@
     }
   };
 
-  // Start on login form
-  showAuthForm();
+  banBtn.onclick = banSelectedPlayer;
+
+  // Shop Buy Buttons
+  shop.querySelectorAll('button[data-price]').forEach(btn => {
+    btn.onclick = () => {
+      if (!currentUser) return;
+      const price = parseInt(btn.dataset.price, 10);
+      const item = btn.dataset.item;
+      if (money < price) {
+        alert(`You don't have enough money to buy ${item}!`);
+        return;
+      }
+      money -= price;
+      users[currentUser].money = money;
+      if (!users[currentUser].items) users[currentUser].items = [];
+      users[currentUser].items.push(item);
+      saveStorage();
+      updateMoney();
+      log(`Bought "${item}" for $${price}`);
+      // Optionally disable button if bought once:
+      // btn.disabled = true;
+    };
+  });
+
+  // Initial load
+  loadStorage();
+  showAuth();
+
 })();
 </script>
 
