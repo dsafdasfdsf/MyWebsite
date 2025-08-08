@@ -4,31 +4,115 @@
   <meta charset="UTF-8" />
   <title>Simple Admin Panel</title>
   <style>
-    body { font-family: Arial, sans-serif; max-width: 400px; margin: 50px auto; }
-    #dashboard { display: none; }
+    /* Reset and base styles */
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #f4f7f9;
+      margin: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      color: #333;
+    }
+    /* Container */
+    .container {
+      background: #fff;
+      padding: 2rem 2.5rem;
+      border-radius: 12px;
+      width: 100%;
+      max-width: 400px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+      text-align: center;
+    }
+    h2 {
+      margin-bottom: 1.5rem;
+      font-weight: 600;
+      color: #222;
+    }
+    /* Form elements */
+    label {
+      display: block;
+      text-align: left;
+      font-weight: 500;
+      margin-bottom: 0.25rem;
+      color: #555;
+    }
+    input[type="text"],
+    input[type="password"] {
+      width: 100%;
+      padding: 0.6rem 1rem;
+      margin-bottom: 1.2rem;
+      border: 1.8px solid #ccc;
+      border-radius: 9999px; /* fully rounded */
+      font-size: 1rem;
+      transition: border-color 0.3s ease;
+    }
+    input[type="text"]:focus,
+    input[type="password"]:focus {
+      border-color: #0070f3;
+      outline: none;
+      box-shadow: 0 0 5px rgba(0, 112, 243, 0.5);
+    }
+    /* Buttons */
+    button {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      background-color: #0070f3;
+      border: none;
+      border-radius: 9999px; /* fully rounded */
+      color: white;
+      font-weight: 600;
+      font-size: 1.1rem;
+      cursor: pointer;
+      transition: background-color 0.25s ease;
+    }
+    button:hover {
+      background-color: #005bb5;
+    }
+    /* Error message */
+    #error {
+      color: #e53e3e;
+      min-height: 1.2em;
+      margin-bottom: 1rem;
+      font-weight: 500;
+    }
+    /* Dashboard */
+    #dashboard {
+      display: none;
+    }
+    #dashboard p {
+      margin-bottom: 1.5rem;
+      font-size: 1.05rem;
+      color: #444;
+    }
   </style>
 </head>
 <body>
 
-  <h2>Admin Login</h2>
-  
-  <div id="login-form">
-    <label>Username:<br />
-      <input type="text" id="username" />
-    </label><br /><br />
-    
-    <label>Password:<br />
-      <input type="password" id="password" />
-    </label><br /><br />
-    
-    <button onclick="login()">Login</button>
-    <p id="error" style="color: red;"></p>
-  </div>
-  
-  <div id="dashboard">
-    <h2>Welcome, Admin!</h2>
-    <p>This is your admin dashboard.</p>
-    <button onclick="logout()">Logout</button>
+  <div class="container">
+    <h2>Admin Login</h2>
+
+    <div id="login-form">
+      <label for="username">Username:</label>
+      <input type="text" id="username" autocomplete="username" />
+
+      <label for="password">Password:</label>
+      <input type="password" id="password" autocomplete="current-password" />
+
+      <div id="error"></div>
+
+      <button onclick="login()">Login</button>
+    </div>
+
+    <div id="dashboard">
+      <h2>Welcome, Admin!</h2>
+      <p>This is your admin dashboard.</p>
+      <button onclick="logout()">Logout</button>
+    </div>
   </div>
 
   <script>
@@ -36,7 +120,7 @@
     const validPass = '1234';
 
     function login() {
-      const user = document.getElementById('username').value;
+      const user = document.getElementById('username').value.trim();
       const pass = document.getElementById('password').value;
       const errorEl = document.getElementById('error');
 
@@ -54,6 +138,7 @@
       document.getElementById('login-form').style.display = 'block';
       document.getElementById('username').value = '';
       document.getElementById('password').value = '';
+      document.getElementById('error').textContent = '';
     }
   </script>
 
