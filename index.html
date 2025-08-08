@@ -1,391 +1,402 @@
 <!DOCTYPE html>
-<html lang="en" >
+<html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Animated Admin Panel + Currency System</title>
-  <style>
-    /* Reset & base */
-    * {
-      box-sizing: border-box;
-    }
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: #f0f4f8;
-      margin: 0;
-      display: flex;
-      justify-content: center;
-      align-items: flex-start;
-      padding: 2rem;
-      min-height: 100vh;
-      color: #333;
-    }
-    .container {
-      background: #fff;
-      border-radius: 12px;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.1);
-      width: 360px;
-      padding: 2rem;
-      overflow: hidden;
-      position: relative;
-    }
-    h2 {
-      margin-top: 0;
-      margin-bottom: 1.5rem;
-      text-align: center;
-      font-weight: 700;
-      color: #222;
-      user-select: none;
-    }
-    label {
-      font-weight: 600;
-      display: block;
-      margin-bottom: 0.3rem;
-      color: #555;
-      user-select: none;
-    }
-    input[type="text"],
-    input[type="password"] {
-      width: 100%;
-      padding: 0.6rem 1rem;
-      margin-bottom: 1.2rem;
-      border: 1.8px solid #ccc;
-      border-radius: 9999px;
-      font-size: 1rem;
-      transition: border-color 0.3s ease, box-shadow 0.3s ease;
-    }
-    input[type="text"]:focus,
-    input[type="password"]:focus {
-      border-color: #0070f3;
-      outline: none;
-      box-shadow: 0 0 5px rgba(0,112,243,0.5);
-    }
-    button {
-      width: 100%;
-      padding: 0.75rem 1rem;
-      background-color: #0070f3;
-      border: none;
-      border-radius: 9999px;
-      color: white;
-      font-weight: 600;
-      font-size: 1.1rem;
-      cursor: pointer;
-      transition: background-color 0.25s ease, transform 0.15s ease;
-      margin-top: 0.5rem;
-      user-select: none;
-    }
-    button:hover:not(:disabled) {
-      background-color: #005bb5;
-      transform: scale(1.05);
-    }
-    button:active:not(:disabled) {
-      transform: scale(0.98);
-    }
-    button:disabled {
-      background-color: #999;
-      cursor: not-allowed;
-      transform: none;
-    }
-    #error {
-      color: #e53e3e;
-      min-height: 1.2em;
-      margin-bottom: 1rem;
-      font-weight: 500;
-      text-align: center;
-      user-select: none;
-    }
-    #dashboard {
-      display: none;
-      text-align: center;
-      animation: fadeIn 0.7s ease forwards;
-    }
-    #money {
-      font-weight: 700;
-      font-size: 1.6rem;
-      margin-bottom: 1.2rem;
-      color: #0a66c2;
-      user-select: none;
-    }
-    .items {
-      display: flex;
-      flex-direction: column;
-      gap: 1rem;
-      margin-top: 1rem;
-    }
-    .item {
-      background: #e1e8ff;
-      border-radius: 12px;
-      padding: 1rem;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-weight: 600;
-      color: #023e8a;
-      user-select: none;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.07);
-      transition: box-shadow 0.3s ease;
-    }
-    .item:hover {
-      box-shadow: 0 6px 12px rgba(0,0,0,0.12);
-    }
-    .item button {
-      width: auto;
-      padding: 0.4rem 1rem;
-      font-size: 1rem;
-      border-radius: 9999px;
-      user-select: none;
-      transition: background-color 0.3s ease, transform 0.2s ease;
-    }
-    .item button:hover:not(:disabled) {
-      background-color: #004a99;
-      transform: scale(1.1);
-    }
-    .item button:disabled {
-      background-color: #999;
-      cursor: not-allowed;
-      transform: none;
-    }
-    #adminPanel {
-      margin-top: 2rem;
-      background: #f5f7fa;
-      border-radius: 12px;
-      padding: 1rem;
-      text-align: left;
-      font-size: 0.9rem;
-      color: #555;
-      max-height: 150px;
-      overflow-y: auto;
-      user-select: none;
-      box-shadow: inset 0 0 10px rgba(0,0,0,0.05);
-    }
-    #adminPanel strong {
-      display: block;
-      margin-bottom: 0.5rem;
-      user-select: none;
-    }
-    #logList {
-      padding-left: 1rem;
-      margin: 0;
-    }
-    #logList li {
-      margin-bottom: 0.3rem;
-      opacity: 0;
-      animation: fadeInUp 0.5s forwards;
-    }
-
-    @keyframes fadeIn {
-      from {opacity: 0; transform: translateY(20px);}
-      to {opacity:1; transform: translateY(0);}
-    }
-    @keyframes fadeInUp {
-      from {opacity: 0; transform: translateY(8px);}
-      to {opacity:1; transform: translateY(0);}
-    }
-
-    /* Animate money number change */
-    .money-update {
-      animation: pulse 0.5s ease forwards;
-    }
-    @keyframes pulse {
-      0% {
-        color: #0a66c2;
-        transform: scale(1);
-      }
-      50% {
-        color: #0070f3;
-        transform: scale(1.3);
-      }
-      100% {
-        color: #0a66c2;
-        transform: scale(1);
-      }
-    }
-  </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Simple Game with Admin Panel</title>
+<style>
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: #f0f4f8;
+    margin: 0; padding: 0;
+    display: flex; justify-content: center; align-items: center; min-height: 100vh;
+  }
+  #container {
+    background: white;
+    padding: 20px 30px;
+    border-radius: 15px;
+    width: 350px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+  }
+  h2 {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #333;
+  }
+  input[type=text], input[type=password] {
+    width: 100%;
+    padding: 10px 12px;
+    margin-bottom: 15px;
+    border: 1.5px solid #ccc;
+    border-radius: 10px;
+    font-size: 16px;
+    box-sizing: border-box;
+    transition: border-color 0.3s;
+  }
+  input[type=text]:focus, input[type=password]:focus {
+    border-color: #0070f3;
+    outline: none;
+  }
+  button {
+    width: 100%;
+    padding: 12px;
+    background: #0070f3;
+    color: white;
+    border: none;
+    font-weight: 600;
+    border-radius: 12px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s;
+  }
+  button:hover:not(:disabled) {
+    background: #005bb5;
+  }
+  button:disabled {
+    background: #aaa;
+    cursor: not-allowed;
+  }
+  #message {
+    color: red;
+    text-align: center;
+    margin-bottom: 10px;
+  }
+  #game, #adminPanel {
+    display: none;
+  }
+  .log {
+    max-height: 120px;
+    overflow-y: auto;
+    background: #eef3f7;
+    border-radius: 12px;
+    padding: 10px;
+    font-size: 14px;
+    color: #444;
+    margin-top: 10px;
+  }
+  .money {
+    font-weight: bold;
+    font-size: 22px;
+    color: #2a9d8f;
+    text-align: center;
+    margin-bottom: 10px;
+  }
+  label {
+    font-weight: 600;
+    display: block;
+    margin-top: 10px;
+  }
+  select, input[type=number] {
+    width: 100%;
+    padding: 8px 10px;
+    margin-top: 6px;
+    border-radius: 10px;
+    border: 1.5px solid #ccc;
+    box-sizing: border-box;
+  }
+  .small-btn {
+    margin-top: 10px;
+    padding: 8px;
+    width: 100%;
+    border-radius: 10px;
+    font-weight: 600;
+  }
+  .btn-danger {
+    background: #d9534f;
+  }
+  .btn-danger:hover {
+    background: #b52b27;
+  }
+  .btn-success {
+    background: #5cb85c;
+  }
+  .btn-success:hover {
+    background: #3c8d3c;
+  }
+</style>
 </head>
 <body>
 
-  <div class="container" role="main" aria-label="Admin panel login and dashboard">
+<div id="container">
 
-    <h2>Admin Login</h2>
-
-    <div id="login-form">
-      <label for="username">Username:</label>
-      <input type="text" id="username" autocomplete="username" aria-required="true" aria-label="Username input" />
-
-      <label for="password">Password:</label>
-      <input type="password" id="password" autocomplete="current-password" aria-required="true" aria-label="Password input" />
-
-      <div id="error" aria-live="assertive"></div>
-
-      <button id="loginBtn" onclick="login()" aria-label="Login button">Login</button>
-    </div>
-
-    <div id="dashboard" aria-live="polite" aria-atomic="true">
-      <h2>Welcome, Admin!</h2>
-      <div id="money" aria-label="Current money amount" tabindex="0">Money: 0 💰</div>
-
-      <div class="items" role="list" aria-label="Available items to buy">
-        <div class="item" role="listitem">
-          <span>Buy a Coffee (Cost: 5)</span>
-          <button onclick="buyItem('Coffee', 5)" aria-label="Buy Coffee for 5 money">Buy</button>
-        </div>
-        <div class="item" role="listitem">
-          <span>Buy a Book (Cost: 10)</span>
-          <button onclick="buyItem('Book', 10)" aria-label="Buy Book for 10 money">Buy</button>
-        </div>
-        <div class="item" role="listitem">
-          <span>Buy a Laptop (Cost: 50)</span>
-          <button onclick="buyItem('Laptop', 50)" aria-label="Buy Laptop for 50 money">Buy</button>
-        </div>
-      </div>
-
-      <button id="logoutBtn" style="margin-top:2rem; background:#e63946;" onclick="logout()" aria-label="Logout button">Logout</button>
-
-      <div id="adminPanel" aria-label="Admin panel logs">
-        <strong>Admin Panel Logs:</strong>
-        <ul id="logList" role="list"></ul>
-      </div>
-    </div>
-
+  <!-- Login / Signup -->
+  <div id="auth">
+    <h2>Login or Sign Up</h2>
+    <div id="message"></div>
+    <input type="text" id="username" placeholder="Username" autocomplete="off" />
+    <input type="password" id="password" placeholder="Password" autocomplete="off" />
+    <button id="loginBtn">Login</button>
+    <button id="signupBtn" style="margin-top: 8px; background:#2a9d8f;">Sign Up</button>
   </div>
 
-  <script>
-    const validUser = 'admin';
-    const validPass = '1234';
+  <!-- Game Panel -->
+  <div id="game">
+    <h2>Welcome, <span id="playerName"></span>!</h2>
+    <div class="money">Money: $<span id="moneyCount">0</span></div>
+    <button id="logoutBtn" style="background:#d9534f;">Logout</button>
+    <div class="log" id="gameLog"></div>
+  </div>
 
-    let money = 0;
-    let earningInterval;
-    const logList = document.getElementById('logList');
-    const moneyEl = document.getElementById('money');
-    const loginBtn = document.getElementById('loginBtn');
-    const logoutBtn = document.getElementById('logoutBtn');
-    const errorEl = document.getElementById('error');
+  <!-- Admin Panel -->
+  <div id="adminPanel">
+    <h2>Admin Panel</h2>
+    <div>
+      <label for="playerSelect">Select Player</label>
+      <select id="playerSelect"></select>
 
-    // Update money display with animation
-    function updateMoney() {
-      moneyEl.textContent = `Money: ${money} 💰`;
-      moneyEl.classList.remove('money-update');
-      // Trigger reflow to restart animation
-      void moneyEl.offsetWidth;
-      moneyEl.classList.add('money-update');
+      <label for="moneyAmount">Money Amount</label>
+      <input type="number" id="moneyAmount" min="1" value="10" />
+
+      <button class="small-btn btn-success" id="giveMoneyBtn">Give Money</button>
+      <button class="small-btn btn-danger" id="banPlayerBtn">Ban Player</button>
+    </div>
+    <button id="adminLogoutBtn" style="background:#d9534f; margin-top: 15px;">Logout</button>
+    <div class="log" id="adminLog"></div>
+  </div>
+
+</div>
+
+<script>
+  // Helper functions for localStorage data
+  function getUsers() {
+    return JSON.parse(localStorage.getItem('users') || '{}');
+  }
+  function saveUsers(users) {
+    localStorage.setItem('users', JSON.stringify(users));
+  }
+  function getBannedUsers() {
+    return JSON.parse(localStorage.getItem('bannedUsers') || '[]');
+  }
+  function saveBannedUsers(banned) {
+    localStorage.setItem('bannedUsers', JSON.stringify(banned));
+  }
+
+  // Current session info
+  let currentUser = null;
+  let earningInterval = null;
+
+  // DOM elements
+  const authDiv = document.getElementById('auth');
+  const gameDiv = document.getElementById('game');
+  const adminDiv = document.getElementById('adminPanel');
+  const messageEl = document.getElementById('message');
+  const usernameInput = document.getElementById('username');
+  const passwordInput = document.getElementById('password');
+  const loginBtn = document.getElementById('loginBtn');
+  const signupBtn = document.getElementById('signupBtn');
+  const playerNameEl = document.getElementById('playerName');
+  const moneyCountEl = document.getElementById('moneyCount');
+  const logoutBtn = document.getElementById('logoutBtn');
+  const adminLogoutBtn = document.getElementById('adminLogoutBtn');
+  const gameLog = document.getElementById('gameLog');
+  const adminLog = document.getElementById('adminLog');
+  const playerSelect = document.getElementById('playerSelect');
+  const moneyAmountInput = document.getElementById('moneyAmount');
+  const giveMoneyBtn = document.getElementById('giveMoneyBtn');
+  const banPlayerBtn = document.getElementById('banPlayerBtn');
+
+  // Initial admin account setup
+  function initAdmin() {
+    let users = getUsers();
+    if (!users['admin']) {
+      users['admin'] = { password: 'admin123', money: 0, role: 'admin' };
+      saveUsers(users);
     }
+  }
 
-    // Add message to admin panel logs with animation
-    function addLog(msg) {
-      const li = document.createElement('li');
-      li.textContent = `${new Date().toLocaleTimeString()}: ${msg}`;
-      logList.appendChild(li);
-      logList.scrollTop = logList.scrollHeight;
-    }
+  // Add log entry
+  function addLog(logArea, text) {
+    const time = new Date().toLocaleTimeString();
+    const entry = document.createElement('div');
+    entry.textContent = `[${time}] ${text}`;
+    logArea.appendChild(entry);
+    logArea.scrollTop = logArea.scrollHeight;
+  }
 
-    // Disable inputs & buttons during login animation
-    function setInputsDisabled(disabled) {
-      document.getElementById('username').disabled = disabled;
-      document.getElementById('password').disabled = disabled;
-      loginBtn.disabled = disabled;
-    }
+  // Show message
+  function showMessage(text) {
+    messageEl.textContent = text;
+    setTimeout(() => {
+      messageEl.textContent = '';
+    }, 3000);
+  }
 
-    // Login function with animation and validation
-    function login() {
-      setInputsDisabled(true);
-      errorEl.textContent = '';
-      const user = document.getElementById('username').value.trim();
-      const pass = document.getElementById('password').value;
+  // Update money display
+  function updateMoney() {
+    const users = getUsers();
+    if (!currentUser) return;
+    moneyCountEl.textContent = users[currentUser].money || 0;
+  }
 
-      // Animate button loading
-      loginBtn.textContent = 'Logging in...';
+  // Start earning money every 30 seconds
+  function startEarning() {
+    earningInterval = setInterval(() => {
+      const users = getUsers();
+      if (!currentUser) return;
+      users[currentUser].money = (users[currentUser].money || 0) + 1;
+      saveUsers(users);
+      updateMoney();
+      addLog(gameLog, 'Earned 1 money');
+    }, 30000);
+  }
 
-      setTimeout(() => {
-        if (user === validUser && pass === validPass) {
-          document.getElementById('login-form').style.display = 'none';
-          document.getElementById('dashboard').style.display = 'block';
-          loginBtn.textContent = 'Login';
-          errorEl.textContent = '';
+  // Stop earning money
+  function stopEarning() {
+    clearInterval(earningInterval);
+  }
 
-          // Load money from localStorage or start fresh
-          money = parseInt(localStorage.getItem('money')) || 0;
-          updateMoney();
-          addLog('Admin logged in');
-
-          // Start earning money every 30 seconds
-          earningInterval = setInterval(() => {
-            money++;
-            updateMoney();
-            addLog('Earned 1 money');
-            localStorage.setItem('money', money);
-          }, 30000);
-        } else {
-          errorEl.textContent = 'Invalid username or password.';
-          loginBtn.textContent = 'Login';
-        }
-        setInputsDisabled(false);
-      }, 1200); // fake delay for animation
-    }
-
-    // Logout function with fadeout animation
-    function logout() {
-      clearInterval(earningInterval);
-      addLog('Admin logged out');
-
-      // Animate dashboard fade out
-      const dashboard = document.getElementById('dashboard');
-      dashboard.style.animation = 'fadeOut 0.6s ease forwards';
-
-      setTimeout(() => {
-        dashboard.style.animation = '';
-        dashboard.style.display = 'none';
-        document.getElementById('login-form').style.display = 'block';
-        document.getElementById('username').value = '';
-        document.getElementById('password').value = '';
-        errorEl.textContent = '';
-      }, 600);
-    }
-
-    // Buy item function with button disable + animation
-    function buyItem(itemName, cost) {
-      if (money >= cost) {
-        money -= cost;
-        updateMoney();
-        localStorage.setItem('money', money);
-        addLog(`Bought ${itemName} for ${cost} money`);
-        animateButtonBuy(itemName);
-        alert(`You bought a ${itemName}!`);
-      } else {
-        alert(`Not enough money to buy ${itemName}.`);
-      }
-    }
-
-    // Animate buy button on purchase
-    function animateButtonBuy(itemName) {
-      const buttons = document.querySelectorAll('.items button');
-      buttons.forEach(btn => {
-        if (btn.previousElementSibling.textContent.includes(itemName)) {
-          btn.disabled = true;
-          btn.style.backgroundColor = '#2a9d8f';
-          btn.style.transform = 'scale(1.15)';
-          setTimeout(() => {
-            btn.disabled = false;
-            btn.style.backgroundColor = '#0070f3';
-            btn.style.transform = 'scale(1)';
-          }, 700);
-        }
-      });
-    }
-
-    // Accessibility: press Enter to login
-    document.getElementById('password').addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') {
-        login();
+  // Load player list into select dropdown (admin)
+  function loadPlayerList() {
+    playerSelect.innerHTML = '';
+    const users = getUsers();
+    Object.keys(users).forEach(u => {
+      if (u !== 'admin') {
+        const option = document.createElement('option');
+        option.value = u;
+        option.textContent = u;
+        playerSelect.appendChild(option);
       }
     });
+  }
 
-  </script>
-
-  <style>
-    @keyframes fadeOut {
-      from {opacity: 1; transform: translateY(0);}
-      to {opacity:0; transform: translateY(20px);}
+  // Ban player
+  function banPlayer(username) {
+    if (!username) return;
+    const banned = getBannedUsers();
+    if (!banned.includes(username)) {
+      banned.push(username);
+      saveBannedUsers(banned);
+      addLog(adminLog, `Banned player: ${username}`);
+      showMessage(`Player "${username}" banned.`);
+      loadPlayerList();
     }
-  </style>
+  }
+
+  // Give money to player
+  function giveMoney(username, amount) {
+    const users = getUsers();
+    if (!users[username]) {
+      showMessage(`Player "${username}" does not exist.`);
+      return;
+    }
+    users[username].money = (users[username].money || 0) + amount;
+    saveUsers(users);
+    addLog(adminLog, `Gave ${amount} money to ${username}`);
+    showMessage(`Gave ${amount} money to ${username}`);
+  }
+
+  // Login handler
+  function login() {
+    const username = usernameInput.value.trim();
+    const password = passwordInput.value;
+    if (!username || !password) {
+      showMessage('Enter username and password');
+      return;
+    }
+    const banned = getBannedUsers();
+    if (banned.includes(username)) {
+      showMessage('You are banned!');
+      return;
+    }
+    const users = getUsers();
+    if (!users[username]) {
+      showMessage('User not found');
+      return;
+    }
+    if (users[username].password !== password) {
+      showMessage('Wrong password');
+      return;
+    }
+
+    currentUser = username;
+    usernameInput.value = '';
+    passwordInput.value = '';
+    messageEl.textContent = '';
+
+    authDiv.style.display = 'none';
+
+    if (users[username].role === 'admin') {
+      adminDiv.style.display = 'block';
+      loadPlayerList();
+      addLog(adminLog, 'Admin logged in');
+    } else {
+      gameDiv.style.display = 'block';
+      playerNameEl.textContent = currentUser;
+      updateMoney();
+      addLog(gameLog, 'Player logged in');
+      startEarning();
+    }
+  }
+
+  // Signup handler
+  function signup() {
+    const username = usernameInput.value.trim();
+    const password = passwordInput.value;
+    if (!username || !password) {
+      showMessage('Enter username and password');
+      return;
+    }
+    let users = getUsers();
+    if (users[username]) {
+      showMessage('Username already taken');
+      return;
+    }
+    const banned = getBannedUsers();
+    if (banned.includes(username)) {
+      showMessage('You are banned!');
+      return;
+    }
+    users[username] = { password: password, money: 0, role: 'player' };
+    saveUsers(users);
+    showMessage('Account created! You can now login.');
+    usernameInput.value = '';
+    passwordInput.value = '';
+  }
+
+  // Logout handler for player
+  function logout() {
+    stopEarning();
+    addLog(gameLog, 'Player logged out');
+    currentUser = null;
+    gameDiv.style.display = 'none';
+    authDiv.style.display = 'block';
+  }
+
+  // Logout handler for admin
+  function adminLogout() {
+    currentUser = null;
+    addLog(adminLog, 'Admin logged out');
+    adminDiv.style.display = 'none';
+    authDiv.style.display = 'block';
+  }
+
+  // Event Listeners
+  loginBtn.addEventListener('click', login);
+  signupBtn.addEventListener('click', signup);
+  logoutBtn.addEventListener('click', logout);
+  adminLogoutBtn.addEventListener('click', adminLogout);
+  giveMoneyBtn.addEventListener('click', () => {
+    const player = playerSelect.value;
+    const amount = parseInt(moneyAmountInput.value);
+    if (!player || isNaN(amount) || amount <= 0) {
+      showMessage('Select player and valid amount');
+      return;
+    }
+    giveMoney(player, amount);
+  });
+  banPlayerBtn.addEventListener('click', () => {
+    const player = playerSelect.value;
+    if (!player) {
+      showMessage('Select player');
+      return;
+    }
+    banPlayer(player);
+  });
+
+  // Initialize admin account on page load
+  initAdmin();
+
+</script>
 
 </body>
 </html>
