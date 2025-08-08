@@ -1,79 +1,250 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" >
 <head>
   <meta charset="UTF-8" />
-  <title>Website with Visitor Counter & Ban</title>
+  <title>Simple Admin Panel + Currency System</title>
   <style>
+    /* Reset & base */
+    * {
+      box-sizing: border-box;
+    }
     body {
-      font-family: Arial, sans-serif;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #f0f4f8;
+      margin: 0;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
       padding: 2rem;
-      max-width: 600px;
-      margin: auto;
-      background: #f9f9f9;
+      min-height: 100vh;
+      color: #333;
+    }
+    .container {
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+      width: 360px;
+      padding: 2rem;
+    }
+    h2 {
+      margin-top: 0;
+      margin-bottom: 1.5rem;
+      text-align: center;
+      font-weight: 700;
+      color: #222;
+    }
+    label {
+      font-weight: 600;
+      display: block;
+      margin-bottom: 0.3rem;
+      color: #555;
+    }
+    input[type="text"],
+    input[type="password"] {
+      width: 100%;
+      padding: 0.6rem 1rem;
+      margin-bottom: 1.2rem;
+      border: 1.8px solid #ccc;
+      border-radius: 9999px;
+      font-size: 1rem;
+      transition: border-color 0.3s ease;
+    }
+    input[type="text"]:focus,
+    input[type="password"]:focus {
+      border-color: #0070f3;
+      outline: none;
+      box-shadow: 0 0 5px rgba(0,112,243,0.5);
+    }
+    button {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      background-color: #0070f3;
+      border: none;
+      border-radius: 9999px;
+      color: white;
+      font-weight: 600;
+      font-size: 1.1rem;
+      cursor: pointer;
+      transition: background-color 0.25s ease;
+      margin-top: 0.5rem;
+    }
+    button:hover {
+      background-color: #005bb5;
+    }
+    #error {
+      color: #e53e3e;
+      min-height: 1.2em;
+      margin-bottom: 1rem;
+      font-weight: 500;
       text-align: center;
     }
-    #ban-message {
-      color: red;
-      font-weight: bold;
-      font-size: 1.2rem;
+    #dashboard {
+      display: none;
+      text-align: center;
+    }
+    #money {
+      font-weight: 700;
+      font-size: 1.4rem;
+      margin-bottom: 1.2rem;
+      color: #0a66c2;
+    }
+    .items {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+    .item {
+      background: #e1e8ff;
+      border-radius: 12px;
+      padding: 1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-weight: 600;
+      color: #023e8a;
+    }
+    .item button {
+      width: auto;
+      padding: 0.4rem 1rem;
+      font-size: 1rem;
+      border-radius: 9999px;
+    }
+    #adminPanel {
       margin-top: 2rem;
+      background: #f5f7fa;
+      border-radius: 12px;
+      padding: 1rem;
+      text-align: left;
+      font-size: 0.9rem;
+      color: #555;
+      max-height: 150px;
+      overflow-y: auto;
+      user-select: none;
     }
   </style>
 </head>
 <body>
 
-<h1>Welcome to the Website</h1>
+  <div class="container">
 
-<p>Visitor count: <span id="visitorCount">0</span></p>
+    <h2>Admin Login</h2>
 
-<div id="content">
-  <p>This is the main content of the website.</p>
-</div>
+    <div id="login-form">
+      <label for="username">Username:</label>
+      <input type="text" id="username" autocomplete="username" />
 
-<div id="ban-message" style="display:none;">
-  Sorry, you are banned from visiting this website again.
-</div>
+      <label for="password">Password:</label>
+      <input type="password" id="password" autocomplete="current-password" />
 
-<script>
-  // Simple visitor counter saved in localStorage per browser
-  const VISIT_COUNT_KEY = 'visit_count';
-  const BANNED_KEY = 'is_banned';
+      <div id="error"></div>
 
-  // Example banned IDs (you could ban by some stored user id, IP, or token)
-  // For demo, banning if user clicks a "ban me" button (not shown here)
-  // You could also add logic to ban based on IP but that requires backend.
+      <button onclick="login()">Login</button>
+    </div>
 
-  // Increase visit count
-  let count = localStorage.getItem(VISIT_COUNT_KEY);
-  count = count ? parseInt(count) : 0;
-  count++;
-  localStorage.setItem(VISIT_COUNT_KEY, count);
+    <div id="dashboard">
+      <h2>Welcome, Admin!</h2>
+      <div id="money">Money: 0 💰</div>
 
-  // Display visitor count
-  document.getElementById('visitorCount').textContent = count;
+      <div class="items">
+        <div class="item">
+          <span>Buy a Coffee (Cost: 5)</span>
+          <button onclick="buyItem('Coffee', 5)">Buy</button>
+        </div>
+        <div class="item">
+          <span>Buy a Book (Cost: 10)</span>
+          <button onclick="buyItem('Book', 10)">Buy</button>
+        </div>
+        <div class="item">
+          <span>Buy a Laptop (Cost: 50)</span>
+          <button onclick="buyItem('Laptop', 50)">Buy</button>
+        </div>
+      </div>
 
-  // Check if user is banned
-  const isBanned = localStorage.getItem(BANNED_KEY) === 'true';
+      <button style="margin-top:2rem; background:#e63946;" onclick="logout()">Logout</button>
 
-  if (isBanned) {
-    // Hide content and show ban message
-    document.getElementById('content').style.display = 'none';
-    document.getElementById('ban-message').style.display = 'block';
-  }
+      <div id="adminPanel">
+        <strong>Admin Panel Logs:</strong>
+        <ul id="logList"></ul>
+      </div>
+    </div>
 
-  // For demo: a function to ban current user
-  // You could call banUser() from admin panel to ban by some key, saved in localStorage
-  function banUser() {
-    localStorage.setItem(BANNED_KEY, 'true');
-    alert('You are now banned!');
-    location.reload();
-  }
+  </div>
 
-  // Just for demo, ban if visit count > 5 (auto-ban repeat visitors)
-  if (!isBanned && count > 5) {
-    banUser();
-  }
-</script>
+  <script>
+    const validUser = 'admin';
+    const validPass = '1234';
+
+    let money = 0;
+    let earningInterval;
+    const logList = document.getElementById('logList');
+
+    // Update money display
+    function updateMoney() {
+      document.getElementById('money').textContent = `Money: ${money} 💰`;
+    }
+
+    // Add message to admin panel logs
+    function addLog(msg) {
+      const li = document.createElement('li');
+      li.textContent = msg;
+      logList.appendChild(li);
+      // Auto scroll to bottom
+      logList.scrollTop = logList.scrollHeight;
+    }
+
+    // Login function
+    function login() {
+      const user = document.getElementById('username').value.trim();
+      const pass = document.getElementById('password').value;
+      const errorEl = document.getElementById('error');
+
+      if (user === validUser && pass === validPass) {
+        document.getElementById('login-form').style.display = 'none';
+        document.getElementById('dashboard').style.display = 'block';
+        errorEl.textContent = '';
+
+        // Load money from localStorage or start fresh
+        money = parseInt(localStorage.getItem('money')) || 0;
+        updateMoney();
+        addLog('Admin logged in');
+
+        // Start earning money every 30 seconds
+        earningInterval = setInterval(() => {
+          money++;
+          updateMoney();
+          addLog('Earned 1 money');
+          localStorage.setItem('money', money);
+        }, 30000);
+      } else {
+        errorEl.textContent = 'Invalid username or password.';
+      }
+    }
+
+    // Logout function
+    function logout() {
+      clearInterval(earningInterval);
+      document.getElementById('dashboard').style.display = 'none';
+      document.getElementById('login-form').style.display = 'block';
+      document.getElementById('username').value = '';
+      document.getElementById('password').value = '';
+      document.getElementById('error').textContent = '';
+      addLog('Admin logged out');
+    }
+
+    // Buy item function
+    function buyItem(itemName, cost) {
+      if (money >= cost) {
+        money -= cost;
+        updateMoney();
+        localStorage.setItem('money', money);
+        addLog(`Bought ${itemName} for ${cost} money`);
+        alert(`You bought a ${itemName}!`);
+      } else {
+        alert(`Not enough money to buy ${itemName}.`);
+      }
+    }
+  </script>
 
 </body>
 </html>
