@@ -2,145 +2,78 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Simple Admin Panel</title>
+  <title>Website with Visitor Counter & Ban</title>
   <style>
-    /* Reset and base styles */
-    * {
-      box-sizing: border-box;
-    }
     body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: #f4f7f9;
-      margin: 0;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      color: #333;
-    }
-    /* Container */
-    .container {
-      background: #fff;
-      padding: 2rem 2.5rem;
-      border-radius: 12px;
-      width: 100%;
-      max-width: 400px;
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+      font-family: Arial, sans-serif;
+      padding: 2rem;
+      max-width: 600px;
+      margin: auto;
+      background: #f9f9f9;
       text-align: center;
     }
-    h2 {
-      margin-bottom: 1.5rem;
-      font-weight: 600;
-      color: #222;
-    }
-    /* Form elements */
-    label {
-      display: block;
-      text-align: left;
-      font-weight: 500;
-      margin-bottom: 0.25rem;
-      color: #555;
-    }
-    input[type="text"],
-    input[type="password"] {
-      width: 100%;
-      padding: 0.6rem 1rem;
-      margin-bottom: 1.2rem;
-      border: 1.8px solid #ccc;
-      border-radius: 9999px; /* fully rounded */
-      font-size: 1rem;
-      transition: border-color 0.3s ease;
-    }
-    input[type="text"]:focus,
-    input[type="password"]:focus {
-      border-color: #0070f3;
-      outline: none;
-      box-shadow: 0 0 5px rgba(0, 112, 243, 0.5);
-    }
-    /* Buttons */
-    button {
-      width: 100%;
-      padding: 0.75rem 1rem;
-      background-color: #0070f3;
-      border: none;
-      border-radius: 9999px; /* fully rounded */
-      color: white;
-      font-weight: 600;
-      font-size: 1.1rem;
-      cursor: pointer;
-      transition: background-color 0.25s ease;
-    }
-    button:hover {
-      background-color: #005bb5;
-    }
-    /* Error message */
-    #error {
-      color: #e53e3e;
-      min-height: 1.2em;
-      margin-bottom: 1rem;
-      font-weight: 500;
-    }
-    /* Dashboard */
-    #dashboard {
-      display: none;
-    }
-    #dashboard p {
-      margin-bottom: 1.5rem;
-      font-size: 1.05rem;
-      color: #444;
+    #ban-message {
+      color: red;
+      font-weight: bold;
+      font-size: 1.2rem;
+      margin-top: 2rem;
     }
   </style>
 </head>
 <body>
 
-  <div class="container">
-    <h2>Admin Login</h2>
+<h1>Welcome to the Website</h1>
 
-    <div id="login-form">
-      <label for="username">Username:</label>
-      <input type="text" id="username" autocomplete="username" />
+<p>Visitor count: <span id="visitorCount">0</span></p>
 
-      <label for="password">Password:</label>
-      <input type="password" id="password" autocomplete="current-password" />
+<div id="content">
+  <p>This is the main content of the website.</p>
+</div>
 
-      <div id="error"></div>
+<div id="ban-message" style="display:none;">
+  Sorry, you are banned from visiting this website again.
+</div>
 
-      <button onclick="login()">Login</button>
-    </div>
+<script>
+  // Simple visitor counter saved in localStorage per browser
+  const VISIT_COUNT_KEY = 'visit_count';
+  const BANNED_KEY = 'is_banned';
 
-    <div id="dashboard">
-      <h2>Welcome, Admin!</h2>
-      <p>This is your admin dashboard.</p>
-      <button onclick="logout()">Logout</button>
-    </div>
-  </div>
+  // Example banned IDs (you could ban by some stored user id, IP, or token)
+  // For demo, banning if user clicks a "ban me" button (not shown here)
+  // You could also add logic to ban based on IP but that requires backend.
 
-  <script>
-    const validUser = 'admin';
-    const validPass = '1234';
+  // Increase visit count
+  let count = localStorage.getItem(VISIT_COUNT_KEY);
+  count = count ? parseInt(count) : 0;
+  count++;
+  localStorage.setItem(VISIT_COUNT_KEY, count);
 
-    function login() {
-      const user = document.getElementById('username').value.trim();
-      const pass = document.getElementById('password').value;
-      const errorEl = document.getElementById('error');
+  // Display visitor count
+  document.getElementById('visitorCount').textContent = count;
 
-      if (user === validUser && pass === validPass) {
-        document.getElementById('login-form').style.display = 'none';
-        document.getElementById('dashboard').style.display = 'block';
-        errorEl.textContent = '';
-      } else {
-        errorEl.textContent = 'Invalid username or password.';
-      }
-    }
+  // Check if user is banned
+  const isBanned = localStorage.getItem(BANNED_KEY) === 'true';
 
-    function logout() {
-      document.getElementById('dashboard').style.display = 'none';
-      document.getElementById('login-form').style.display = 'block';
-      document.getElementById('username').value = '';
-      document.getElementById('password').value = '';
-      document.getElementById('error').textContent = '';
-    }
-  </script>
+  if (isBanned) {
+    // Hide content and show ban message
+    document.getElementById('content').style.display = 'none';
+    document.getElementById('ban-message').style.display = 'block';
+  }
+
+  // For demo: a function to ban current user
+  // You could call banUser() from admin panel to ban by some key, saved in localStorage
+  function banUser() {
+    localStorage.setItem(BANNED_KEY, 'true');
+    alert('You are now banned!');
+    location.reload();
+  }
+
+  // Just for demo, ban if visit count > 5 (auto-ban repeat visitors)
+  if (!isBanned && count > 5) {
+    banUser();
+  }
+</script>
 
 </body>
 </html>
