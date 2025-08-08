@@ -3,756 +3,394 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Simple Game with Admin Panel & Ban</title>
+<title>Money Game</title>
 <style>
-  /* Basic reset */
+  /* Reset & base */
   * {
     box-sizing: border-box;
-  }
-  body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: #1e1e2f;
-    color: #eee;
     margin: 0;
     padding: 0;
+  }
+  body, html {
+    height: 100%;
+    background: #fff;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: #222;
     display: flex;
     justify-content: center;
-    align-items: flex-start;
-    min-height: 100vh;
+    align-items: center;
     padding: 20px;
   }
-  button {
-    cursor: pointer;
-    border: none;
-    border-radius: 10px;
-    background: #4a90e2;
-    color: white;
-    padding: 10px 20px;
-    font-weight: 600;
-    transition: background-color 0.3s ease, transform 0.2s ease;
-  }
-  button:hover:not(:disabled) {
-    background-color: #357ABD;
-    transform: scale(1.05);
-  }
-  button:disabled {
-    background-color: #666;
-    cursor: not-allowed;
-  }
-  input, select {
-    padding: 8px 12px;
-    border-radius: 10px;
-    border: none;
-    outline: none;
-    margin: 5px 0 15px 0;
-    font-size: 1rem;
-  }
-  label {
-    font-weight: 700;
-    display: block;
-    margin-bottom: 5px;
-  }
-  .container {
-    max-width: 900px;
-    width: 100%;
-    background: #292b3e;
+  #app {
+    width: 360px;
+    background: #f9f9f9;
+    border-radius: 15px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.12);
     padding: 25px;
-    border-radius: 20px;
-    box-shadow: 0 0 15px #0a74da88;
-  }
-  .active {
-    display: block !important;
-  }
-  #auth, #game, #adminPanel, #bannedScreen {
-    display: none;
-    animation: fadeIn 0.7s ease forwards;
-  }
-  @keyframes fadeIn {
-    from {opacity: 0; transform: translateY(15px);}
-    to {opacity: 1; transform: translateY(0);}
-  }
-
-  /* --- Auth --- */
-  #auth input {
-    width: 100%;
-  }
-  #auth button {
-    width: 48%;
-    margin-right: 4%;
-  }
-  #auth button:last-child {
-    margin-right: 0;
-  }
-
-  /* --- Game --- */
-  #game {
     text-align: center;
-  }
-  #playerName {
-    font-weight: 900;
-    font-size: 1.6rem;
-    color: #5cd65c;
-  }
-  #moneyCount {
-    font-size: 2rem;
-    font-weight: 900;
-    margin: 10px 0 20px 0;
-    color: #ffd700;
-    animation: pulseMoney 2s infinite alternate;
-  }
-  @keyframes pulseMoney {
-    0% { text-shadow: 0 0 5px #ffd700; }
-    100% { text-shadow: 0 0 20px #ffd700; }
-  }
-  #gameLog {
-    max-height: 120px;
-    overflow-y: auto;
-    text-align: left;
-    background: #1b1c2e;
-    padding: 10px;
-    border-radius: 15px;
-    margin-top: 10px;
-    font-size: 0.9rem;
-    color: #ccc;
+    overflow: hidden;
+    position: relative;
   }
 
-  /* --- Shop --- */
-  #shopItems {
-    margin-top: 20px;
+  h1 {
+    margin-bottom: 15px;
+    font-weight: 700;
+    color: #333;
   }
-  .shop-item {
-    background: #3a3c5a;
-    margin: 10px auto;
-    max-width: 300px;
-    padding: 12px 15px;
-    border-radius: 15px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    box-shadow: 0 0 10px #357ABD88;
+
+  input, button, select {
+    border-radius: 12px;
+    border: 1.5px solid #ddd;
+    padding: 10px 15px;
+    font-size: 1rem;
+    margin: 8px 0;
+    width: 100%;
+    transition: border-color 0.3s ease;
+  }
+  input:focus, select:focus {
+    outline: none;
+    border-color: #007BFF;
+  }
+  button {
+    background-color: #007BFF;
+    border: none;
+    color: white;
+    font-weight: 600;
+    cursor: pointer;
+    user-select: none;
+    transition: background-color 0.25s ease;
+  }
+  button:hover {
+    background-color: #0056b3;
+  }
+
+  .fade-slide {
     opacity: 0;
-    transform: translateY(20px);
+    transform: translateY(15px);
     animation-fill-mode: forwards;
+    animation-duration: 0.5s;
+    animation-timing-function: cubic-bezier(0.4,0,0.2,1);
   }
-  .shop-item.fade-in {
-    animation: fadeInUp 0.6s ease forwards;
+  .fade-slide.show {
+    animation-name: fadeInSlideUp;
   }
-  @keyframes fadeInUp {
+  @keyframes fadeInSlideUp {
     to {
       opacity: 1;
       transform: translateY(0);
     }
   }
 
-  /* --- Admin Panel --- */
-  #adminPanel {
-    margin-top: 30px;
-    background: #252745;
-    border-radius: 20px;
-    padding: 20px;
-    box-shadow: 0 0 20px #4a90e288;
-    color: #ccc;
-  }
-  #adminPanel h2 {
-    margin-top: 0;
-    color: #5cd65c;
-    text-align: center;
-  }
-  #adminPanel label {
-    color: #a2d5a2;
-  }
-  #adminPanel select, #adminPanel input {
-    width: 100%;
-    max-width: 250px;
-  }
-  #adminPanel button {
-    margin-top: 10px;
-    width: 150px;
-  }
-  #logsContainer {
-    margin-top: 25px;
-    display: flex;
-    gap: 15px;
-    flex-wrap: wrap;
-    justify-content: center;
-  }
-  .log-block {
-    background: #1c1e32;
-    border-radius: 15px;
-    padding: 12px;
-    flex: 1 1 280px;
-    max-height: 250px;
-    overflow-y: auto;
-    box-shadow: inset 0 0 10px #4a90e288;
-  }
-  .log-block label {
+  #moneyDisplay {
+    font-size: 1.5rem;
     font-weight: 700;
-    margin-bottom: 8px;
-    display: block;
-    color: #82caff;
-  }
-  .log-section div {
-    margin-bottom: 6px;
-    font-size: 0.85rem;
-    line-height: 1.2rem;
+    margin: 15px 0;
+    color: #007BFF;
   }
 
-  /* --- Banned Screen --- */
-  #bannedScreen {
-    text-align: center;
-    padding: 30px 20px;
-    background: #8b0000cc;
-    border-radius: 20px;
-    box-shadow: 0 0 25px #b30000aa;
-    color: #ffdddd;
-  }
-  #bannedScreen h2 {
-    font-size: 2rem;
-    margin-bottom: 15px;
-    animation: shake 0.8s ease infinite;
-  }
-  #applyUnbanBtn, #bannedLogoutBtn {
-    margin: 10px 15px 0 15px;
-    font-weight: 700;
-    background: #b30000;
+  #log {
+    height: 110px;
+    background: #fff;
+    border: 1.5px solid #ddd;
     border-radius: 12px;
-    box-shadow: 0 0 8px #b30000cc;
-    transition: background-color 0.3s ease, transform 0.2s ease;
+    overflow-y: auto;
+    text-align: left;
+    padding: 10px;
+    font-size: 0.9rem;
+    color: #555;
+    margin-top: 15px;
   }
-  #applyUnbanBtn:hover {
-    background-color: #ff4d4d;
-    transform: scale(1.1);
+
+  /* Shop styling */
+  #shop {
+    margin-top: 15px;
+    text-align: left;
   }
-  #bannedLogoutBtn:hover {
-    background-color: #ff6666;
-    transform: scale(1.1);
+  .shop-item {
+    background: #fff;
+    margin-bottom: 10px;
+    padding: 12px 15px;
+    border-radius: 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border: 1.5px solid #ddd;
+    cursor: pointer;
+    user-select: none;
+    transition: box-shadow 0.3s ease, border-color 0.3s ease;
   }
-  @keyframes shake {
-    0%, 100% { transform: translateX(0); }
-    25% { transform: translateX(-8px) rotate(-3deg); }
-    50% { transform: translateX(8px) rotate(3deg); }
-    75% { transform: translateX(-8px) rotate(-3deg); }
+  .shop-item:hover {
+    box-shadow: 0 4px 10px rgba(0,123,255,0.2);
+    border-color: #007BFF;
+  }
+  .shop-item > span {
+    font-weight: 600;
+    color: #333;
+  }
+  .shop-item > button {
+    width: auto;
+    padding: 6px 12px;
+  }
+
+  /* Admin Panel */
+  #adminPanel {
+    margin-top: 20px;
+    background: #eef5ff;
+    border-radius: 15px;
+    padding: 15px;
+    max-height: 250px;
+    overflow-y: auto;
+    text-align: left;
+    font-size: 0.9rem;
+    color: #222;
+  }
+  #adminPanel h2 {
+    text-align: center;
+    margin-bottom: 10px;
+    color: #004085;
+  }
+  .user-list {
+    list-style: none;
+    padding-left: 0;
+    margin-bottom: 10px;
+  }
+  .user-list li {
+    padding: 6px 8px;
+    border-radius: 10px;
+    background: #d1e7ff;
+    margin-bottom: 5px;
+    cursor: pointer;
+    user-select: none;
+    transition: background-color 0.25s ease;
+  }
+  .user-list li:hover {
+    background: #a9d1ff;
+  }
+
+  /* Banned Screen */
+  #bannedScreen {
+    position: absolute;
+    inset: 0;
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 15px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    color: #b00020;
+    font-weight: 700;
+    font-size: 1.3rem;
+    box-shadow: 0 0 15px red;
+    padding: 30px;
+    z-index: 99;
+  }
+  #bannedScreen button {
+    margin-top: 20px;
+    background-color: #b00020;
+  }
+  #bannedScreen button:hover {
+    background-color: #7a0015;
   }
 </style>
 </head>
 <body>
+<div id="app" class="fade-slide show">
+  <h1>Simple Game</h1>
 
-<div class="container">
-
-  <!-- AUTH -->
-  <div id="auth">
-    <h2>Login or Signup</h2>
-    <label for="username">Username</label>
-    <input type="text" id="username" autocomplete="username" />
-    <label for="password">Password</label>
-    <input type="password" id="password" autocomplete="current-password" />
-    <div>
-      <button id="loginBtn">Login</button>
-      <button id="signupBtn">Sign Up</button>
-    </div>
-    <div id="message" style="margin-top: 10px; min-height: 1.2em;"></div>
+  <div id="loginScreen">
+    <input id="username" placeholder="Username" autocomplete="off" />
+    <input id="password" type="password" placeholder="Password" autocomplete="off" />
+    <button id="loginBtn">Login</button>
+    <button id="signupBtn">Sign Up</button>
   </div>
 
-  <!-- GAME -->
-  <div id="game">
-    <h2>Welcome, <span id="playerName"></span>!</h2>
-    <div>Money: $<span id="moneyCount">0</span></div>
-    <button id="logoutBtn" style="margin-top: 20px;">Logout</button>
-    <div id="gameLog"></div>
-    <div id="shopItems"></div>
+  <div id="gameScreen" style="display:none;">
+    <div id="moneyDisplay">Money: $0</div>
+
+    <div id="shop"></div>
+
+    <div id="log"></div>
   </div>
 
-  <!-- ADMIN PANEL -->
-  <div id="adminPanel">
+  <div id="adminPanel" style="display:none;">
     <h2>Admin Panel</h2>
-
-    <label for="playerSelect">Select Player</label>
-    <select id="playerSelect"></select>
-
-    <label for="moneyAmount">Money Amount</label>
-    <input type="number" id="moneyAmount" min="1" placeholder="Enter amount" />
-
+    <ul class="user-list" id="userList"></ul>
+    <input id="adminMoneyInput" type="number" min="1" placeholder="Money amount" />
     <button id="giveMoneyBtn">Give Money</button>
-    <button id="banPlayerBtn" style="margin-left: 10px; background: #c0392b;">Ban Player</button>
-
-    <div id="logsContainer">
-      <div class="log-block">
-        <label>Bans Log</label>
-        <div class="log-section" id="bansLog"></div>
-      </div>
-      <div class="log-block">
-        <label>Money Gifts Log</label>
-        <div class="log-section" id="moneyLog"></div>
-      </div>
-      <div class="log-block">
-        <label>Shop Purchases Log</label>
-        <div class="log-section" id="purchaseLog"></div>
-      </div>
-    </div>
+    <button id="banUserBtn">Ban User</button>
+    <div id="adminLogs" style="margin-top:10px; font-size:0.8rem; color:#555; max-height:100px; overflow-y:auto; background:#fff; padding:8px; border-radius:12px; border:1.5px solid #ccc;"></div>
   </div>
 
-  <!-- BANNED SCREEN -->
-  <div id="bannedScreen">
-    <h2>You are banned!</h2>
-    <p>Your IP is banned from accessing this site.</p>
-    <button id="applyUnbanBtn" style="display:none;">Apply to Unban (Admin Only)</button>
-    <button id="bannedLogoutBtn">Logout</button>
+  <div id="bannedScreen" style="display:none;">
+    <div>You have been banned from this site.</div>
+    <button id="appealBtn">Apply for Appeal</button>
   </div>
-  
 </div>
 
 <script>
-  // Fake user database (in localStorage for demo)
-  // User structure: {password, money, isAdmin (bool), bannedIPs (array of strings)}
-  // Each user stores an array of banned IPs, and globally we ban by IP
-  
-  // Utils
-  function fadeInElements(elements, delay = 100) {
-    elements.forEach((el, i) => {
-      setTimeout(() => {
-        el.classList.add('fade-in');
-      }, i * delay);
-    });
-  }
+(() => {
+  // State
+  let users = JSON.parse(localStorage.getItem('users')) || [];
+  let bannedIPs = JSON.parse(localStorage.getItem('bannedIPs')) || [];
+  let adminLogs = [];
+  let currentUser = null;
+  const visitorIP = 'mocked-ip'; // Replace this with real IP detection if backend is used
 
-  const container = document.querySelector('.container');
-  const authDiv = document.getElementById('auth');
-  const gameDiv = document.getElementById('game');
-  const adminDiv = document.getElementById('adminPanel');
-  const bannedDiv = document.getElementById('bannedScreen');
+  // Elements
+  const loginScreen = document.getElementById('loginScreen');
+  const gameScreen = document.getElementById('gameScreen');
+  const adminPanel = document.getElementById('adminPanel');
+  const bannedScreen = document.getElementById('bannedScreen');
+  const moneyDisplay = document.getElementById('moneyDisplay');
+  const shop = document.getElementById('shop');
+  const log = document.getElementById('log');
+  const userList = document.getElementById('userList');
+  const adminMoneyInput = document.getElementById('adminMoneyInput');
+  const adminLogsElem = document.getElementById('adminLogs');
+  const appealBtn = document.getElementById('appealBtn');
 
-  const usernameInput = document.getElementById('username');
-  const passwordInput = document.getElementById('password');
-  const loginBtn = document.getElementById('loginBtn');
-  const signupBtn = document.getElementById('signupBtn');
-  const messageDiv = document.getElementById('message');
-
-  const playerNameSpan = document.getElementById('playerName');
-  const moneyCountSpan = document.getElementById('moneyCount');
-  const logoutBtn = document.getElementById('logoutBtn');
-  const gameLogDiv = document.getElementById('gameLog');
-
-  const shopItemsDiv = document.getElementById('shopItems');
-
-  const playerSelect = document.getElementById('playerSelect');
-  const moneyAmountInput = document.getElementById('moneyAmount');
-  const giveMoneyBtn = document.getElementById('giveMoneyBtn');
-  const banPlayerBtn = document.getElementById('banPlayerBtn');
-
-  const bansLogDiv = document.getElementById('bansLog');
-  const moneyLogDiv = document.getElementById('moneyLog');
-  const purchaseLogDiv = document.getElementById('purchaseLog');
-
-  const applyUnbanBtn = document.getElementById('applyUnbanBtn');
-  const bannedLogoutBtn = document.getElementById('bannedLogoutBtn');
-
-  // Items in the shop with animation delay for fade-in
+  // Simple shop items
   const shopItems = [
-    { id: 'doubleIncome', name: 'Double Income (1 min)', price: 50, description: 'Earn double money for 60 seconds', effectDuration: 60000 },
-    { id: 'boostIncome', name: 'Boost Income +2 (2 mins)', price: 150, description: 'Increase money per tick by +2 for 2 minutes', effectDuration: 120000 },
-    { id: 'extraMoney', name: 'Extra $10 instantly', price: 10, description: 'Instantly get $10', effectDuration: 0 }
+    { id: 'item1', name: 'Speed Boost', price: 5 },
+    { id: 'item2', name: 'Double Money', price: 10 },
+    { id: 'item3', name: 'VIP Badge', price: 20 },
   ];
 
-  let currentUser = null;
-  let intervalID = null;
-  let incomeMultiplier = 1;
-  let extraIncome = 0;
-  let effectTimeouts = [];
-
-  // IP simulation for banning (random IP for demo)
-  function getUserIP() {
-    // We simulate IP with a fixed fake IP stored per user for demo.
-    // In a real backend, you'd get real IP from requests.
-    let ip = localStorage.getItem('fakeIP_for_' + currentUser.username);
-    if (!ip) {
-      ip = '192.168.1.' + Math.floor(Math.random() * 255);
-      localStorage.setItem('fakeIP_for_' + currentUser.username, ip);
-    }
-    return ip;
+  // Utility functions
+  function saveUsers() {
+    localStorage.setItem('users', JSON.stringify(users));
   }
-
-  // Load users from localStorage or create default admin
-  function loadUsers() {
-    const usersStr = localStorage.getItem('gameUsers');
-    if (usersStr) return JSON.parse(usersStr);
-    // Create default admin user
-    const defaultUsers = {
-      admin: { password: 'admin', money: 0, isAdmin: true, bannedIPs: [] }
-    };
-    localStorage.setItem('gameUsers', JSON.stringify(defaultUsers));
-    return defaultUsers;
+  function saveBannedIPs() {
+    localStorage.setItem('bannedIPs', JSON.stringify(bannedIPs));
   }
-
-  // Save users to localStorage
-  function saveUsers(users) {
-    localStorage.setItem('gameUsers', JSON.stringify(users));
+  function addLog(message) {
+    const entry = `${new Date().toLocaleTimeString()}: ${message}`;
+    log.textContent = entry + '\n' + log.textContent;
+    if (log.textContent.length > 1000) log.textContent = log.textContent.slice(0, 1000);
   }
-
-  // Logs management
-  function addLog(type, text) {
-    let logDiv;
-    if (type === 'ban') logDiv = bansLogDiv;
-    else if (type === 'money') logDiv = moneyLogDiv;
-    else if (type === 'purchase') logDiv = purchaseLogDiv;
-    else return;
-    const now = new Date();
-    const timeStr = now.toLocaleTimeString();
-    const newLog = document.createElement('div');
-    newLog.textContent = `[${timeStr}] ${text}`;
-    logDiv.prepend(newLog);
+  function addAdminLog(message) {
+    adminLogs.unshift(`${new Date().toLocaleTimeString()}: ${message}`);
+    adminLogsElem.textContent = adminLogs.slice(0, 20).join('\n');
   }
-
-  // Update money display
   function updateMoneyDisplay() {
-    moneyCountSpan.textContent = currentUser.money.toFixed(0);
+    moneyDisplay.textContent = `Money: $${currentUser.money}`;
   }
-
-  // Start income interval
-  function startIncomeInterval() {
-    if (intervalID) clearInterval(intervalID);
-    intervalID = setInterval(() => {
-      currentUser.money += (1 * incomeMultiplier) + extraIncome;
-      saveCurrentUser();
-      updateMoneyDisplay();
-      addGameLog(`+${(1*incomeMultiplier)+extraIncome} money earned.`);
-    }, 30000);
-  }
-
-  // Save currentUser info to users list and localStorage
-  function saveCurrentUser() {
-    let users = loadUsers();
-    users[currentUser.username] = currentUser;
-    saveUsers(users);
-  }
-
-  // Add message to game log
-  function addGameLog(text) {
-    const p = document.createElement('p');
-    p.textContent = text;
-    gameLogDiv.appendChild(p);
-    gameLogDiv.scrollTop = gameLogDiv.scrollHeight;
-  }
-
-  // Update admin player list dropdown
-  function updatePlayerSelect() {
-    const users = loadUsers();
-    playerSelect.innerHTML = '';
-    for (const username in users) {
-      const opt = document.createElement('option');
-      opt.value = username;
-      opt.textContent = username;
-      playerSelect.appendChild(opt);
-    }
-  }
-
-  // Ban player by username (adds their IP to banned list)
-  function banPlayer(username) {
-    const users = loadUsers();
-    if (!users[username]) return false;
-    const ipToBan = localStorage.getItem('fakeIP_for_' + username);
-    if (!ipToBan) return false;
-    // Add ip to banned list
-    let bannedIPs = JSON.parse(localStorage.getItem('bannedIPs')) || [];
-    if (!bannedIPs.includes(ipToBan)) {
-      bannedIPs.push(ipToBan);
-      localStorage.setItem('bannedIPs', JSON.stringify(bannedIPs));
-    }
-    // Add to user's bannedIPs for record
-    if (!users[username].bannedIPs) users[username].bannedIPs = [];
-    if (!users[username].bannedIPs.includes(ipToBan)) {
-      users[username].bannedIPs.push(ipToBan);
-    }
-    saveUsers(users);
-    addLog('ban', `Admin banned ${username} (IP: ${ipToBan})`);
-    return true;
-  }
-
-  // Check if current IP is banned
-  function isCurrentIPBanned() {
-    const ip = getUserIP();
-    const bannedIPs = JSON.parse(localStorage.getItem('bannedIPs')) || [];
-    return bannedIPs.includes(ip);
-  }
-
-  // Remove all effects
-  function clearEffects() {
-    effectTimeouts.forEach(t => clearTimeout(t));
-    effectTimeouts = [];
-    incomeMultiplier = 1;
-    extraIncome = 0;
-  }
-
-  // Apply shop item effect
-  function applyEffect(item) {
-    if (item.id === 'doubleIncome') {
-      incomeMultiplier = 2;
-      addGameLog('Double income activated for 60 seconds!');
-      const t = setTimeout(() => {
-        incomeMultiplier = 1;
-        addGameLog('Double income ended.');
-      }, item.effectDuration);
-      effectTimeouts.push(t);
-    } else if (item.id === 'boostIncome') {
-      incomeMultiplier += 2;
-      addGameLog('Income boosted by +2 for 2 minutes!');
-      const t = setTimeout(() => {
-        incomeMultiplier -= 2;
-        addGameLog('Income boost ended.');
-      }, item.effectDuration);
-      effectTimeouts.push(t);
-    } else if (item.id === 'extraMoney') {
-      currentUser.money += 10;
-      updateMoneyDisplay();
-      addGameLog('Instant $10 added!');
-      saveCurrentUser();
-    }
-  }
-
-  // Render shop items
   function renderShop() {
-    shopItemsDiv.innerHTML = '';
-    shopItems.forEach((item, i) => {
+    shop.innerHTML = '';
+    shopItems.forEach(item => {
       const div = document.createElement('div');
       div.className = 'shop-item';
-      div.style.animationDelay = `${i * 150}ms`;
-      const content = `
-        <div>
-          <strong>${item.name}</strong><br/>
-          <small>${item.description}</small>
-        </div>
-        <div>
-          $${item.price}<br/>
-          <button class="buyBtn" data-id="${item.id}">Buy</button>
-        </div>`;
-      div.innerHTML = content;
-      shopItemsDiv.appendChild(div);
+      div.innerHTML = `<span>${item.name} - $${item.price}</span><button data-id="${item.id}">Buy</button>`;
+      div.querySelector('button').onclick = () => {
+        if (currentUser.money >= item.price) {
+          currentUser.money -= item.price;
+          saveUsers();
+          updateMoneyDisplay();
+          addLog(`Bought ${item.name} for $${item.price}`);
+          addAdminLog(`${currentUser.username} bought ${item.name}`);
+        } else {
+          addLog(`Not enough money for ${item.name}`);
+        }
+      };
+      shop.appendChild(div);
     });
-    // Animate fade-in
-    fadeInElements(Array.from(shopItemsDiv.children));
+  }
+  function renderUserList() {
+    userList.innerHTML = '';
+    users.forEach(u => {
+      const li = document.createElement('li');
+      li.textContent = u.username;
+      li.onclick = () => {
+        selectedUser = u;
+        userList.querySelectorAll('li').forEach(el => el.style.backgroundColor = '');
+        li.style.backgroundColor = '#a9d1ff';
+      };
+      userList.appendChild(li);
+    });
   }
 
-  // Show appropriate UI based on login state and ban
-  function showScreen() {
-    if (!currentUser) {
-      authDiv.style.display = 'block';
-      gameDiv.style.display = 'none';
-      adminDiv.style.display = 'none';
-      bannedDiv.style.display = 'none';
+  // Login & Signup
+  document.getElementById('loginBtn').onclick = () => {
+    const username = document.getElementById('username').value.trim();
+    const password = document.getElementById('password').value;
+    if (!username || !password) return alert('Please enter username & password');
+    if (bannedIPs.includes(visitorIP)) {
+      showBanned();
       return;
     }
-    if (isCurrentIPBanned()) {
-      // Show banned screen
-      authDiv.style.display = 'none';
-      gameDiv.style.display = 'none';
-      adminDiv.style.display = 'none';
-      bannedDiv.style.display = 'block';
+    const user = users.find(u => u.username === username && u.password === password);
+    if (!user) return alert('Invalid credentials');
+    currentUser = user;
+    afterLogin();
+  };
+  document.getElementById('signupBtn').onclick = () => {
+    const username = document.getElementById('username').value.trim();
+    const password = document.getElementById('password').value;
+    if (!username || !password) return alert('Please enter username & password');
+    if (users.find(u => u.username === username)) return alert('Username already taken');
+    const newUser = { username, password, money: 0, isAdmin: false };
+    users.push(newUser);
+    saveUsers();
+    alert('Account created! Please login.');
+  };
 
-      // Only admins see apply unban button to bypass
-      applyUnbanBtn.style.display = currentUser.isAdmin ? 'inline-block' : 'none';
-      return;
-    }
-    // Show game screen
-    authDiv.style.display = 'none';
-    bannedDiv.style.display = 'none';
-    gameDiv.style.display = 'block';
+  // After login setup
+  let selectedUser = null;
+  function afterLogin() {
+    loginScreen.style.display = 'none';
+    gameScreen.style.display = 'block';
     updateMoneyDisplay();
-    playerNameSpan.textContent = currentUser.username;
-    gameLogDiv.innerHTML = '';
-    startIncomeInterval();
     renderShop();
-
+    addLog('Welcome ' + currentUser.username);
     if (currentUser.isAdmin) {
-      adminDiv.style.display = 'block';
-      updatePlayerSelect();
-      updateLogs();
-    } else {
-      adminDiv.style.display = 'none';
+      adminPanel.style.display = 'block';
+      renderUserList();
     }
   }
 
-  // Update logs display
-  function updateLogs() {
-    const users = loadUsers();
-    bansLogDiv.innerHTML = '';
-    moneyLogDiv.innerHTML = '';
-    purchaseLogDiv.innerHTML = '';
-
-    // For demo, we only track logs in UI from addLog calls (no persistent logs)
-    // So just show empty here.
-  }
-
-  // Event Handlers
-  loginBtn.onclick = () => {
-    const username = usernameInput.value.trim();
-    const password = passwordInput.value.trim();
-    if (!username || !password) {
-      messageDiv.textContent = 'Please enter username and password.';
-      return;
-    }
-    const users = loadUsers();
-    if (!users[username]) {
-      messageDiv.textContent = 'User not found. Please sign up.';
-      return;
-    }
-    if (users[username].password !== password) {
-      messageDiv.textContent = 'Incorrect password.';
-      return;
-    }
-    currentUser = {...users[username], username};
-    if (isCurrentIPBanned()) {
-      // Show banned screen
-      showScreen();
-      return;
-    }
-    messageDiv.textContent = '';
-    showScreen();
-  };
-
-  signupBtn.onclick = () => {
-    const username = usernameInput.value.trim();
-    const password = passwordInput.value.trim();
-    if (!username || !password) {
-      messageDiv.textContent = 'Please enter username and password.';
-      return;
-    }
-    let users = loadUsers();
-    if (users[username]) {
-      messageDiv.textContent = 'Username already exists.';
-      return;
-    }
-    users[username] = {password, money: 0, isAdmin: false, bannedIPs: []};
-    saveUsers(users);
-    messageDiv.textContent = 'User created. You can login now.';
-  };
-
-  logoutBtn.onclick = () => {
-    currentUser = null;
-    if (intervalID) clearInterval(intervalID);
-    showScreen();
-  };
-
-  bannedLogoutBtn.onclick = () => {
-    currentUser = null;
-    if (intervalID) clearInterval(intervalID);
-    showScreen();
-  };
-
-  applyUnbanBtn.onclick = () => {
-    if (!currentUser || !currentUser.isAdmin) return;
-    // Admin bypasses ban screen, simulate by hiding ban screen
-    bannedDiv.style.display = 'none';
-    gameDiv.style.display = 'block';
-    adminDiv.style.display = 'block';
-    messageDiv.textContent = '';
-    startIncomeInterval();
-    renderShop();
-    updatePlayerSelect();
-  };
-
-  giveMoneyBtn.onclick = () => {
-    const amount = parseInt(moneyAmountInput.value);
-    const targetUser = playerSelect.value;
-    if (!amount || amount < 1) {
-      alert('Enter a valid money amount');
-      return;
-    }
-    if (!targetUser) {
-      alert('Select a player');
-      return;
-    }
-    const users = loadUsers();
-    if (!users[targetUser]) {
-      alert('Selected user not found');
-      return;
-    }
-    users[targetUser].money = (users[targetUser].money || 0) + amount;
-    saveUsers(users);
-    addLog('money', `Admin gave $${amount} to ${targetUser}`);
-    alert(`$${amount} given to ${targetUser}`);
-  };
-
-  banPlayerBtn.onclick = () => {
-    const targetUser = playerSelect.value;
-    if (!targetUser) {
-      alert('Select a player');
-      return;
-    }
-    if (targetUser === currentUser.username) {
-      alert("You can't ban yourself!");
-      return;
-    }
-    const success = banPlayer(targetUser);
-    if (success) {
-      alert(`${targetUser} has been banned.`);
-    } else {
-      alert('Failed to ban user.');
-    }
-  };
-
-  // Buy item event delegation
-  shopItemsDiv.onclick = (e) => {
-    if (!e.target.classList.contains('buyBtn')) return;
+  // Money increment every 30 seconds
+  setInterval(() => {
     if (!currentUser) return;
-    const itemId = e.target.getAttribute('data-id');
-    const item = shopItems.find(i => i.id === itemId);
-    if (!item) return;
-
-    if (currentUser.money < item.price) {
-      addGameLog('Not enough money to buy ' + item.name);
-      return;
-    }
-    currentUser.money -= item.price;
-    saveCurrentUser();
+    currentUser.money++;
+    saveUsers();
     updateMoneyDisplay();
-    addGameLog(`Bought ${item.name} for $${item.price}`);
-    addLog('purchase', `${currentUser.username} bought ${item.name} for $${item.price}`);
-    applyEffect(item);
+  }, 30000);
+
+  // Admin panel buttons
+  document.getElementById('giveMoneyBtn').onclick = () => {
+    if (!selectedUser) return alert('Select a user first');
+    const amount = parseInt(adminMoneyInput.value);
+    if (isNaN(amount) || amount <= 0) return alert('Enter a valid amount');
+    selectedUser.money += amount;
+    saveUsers();
+    addAdminLog(`Gave $${amount} to ${selectedUser.username}`);
+    if (selectedUser.username === currentUser.username) updateMoneyDisplay();
+    renderUserList();
+  };
+  document.getElementById('banUserBtn').onclick = () => {
+    if (!selectedUser) return alert('Select a user first');
+    if (selectedUser.isAdmin) return alert('Cannot ban admin');
+    bannedIPs.push(visitorIP); // Note: This is just demo; ideally ban by IP of selected user
+    saveBannedIPs();
+    addAdminLog(`Banned user ${selectedUser.username}`);
+    alert(`User ${selectedUser.username} has been banned.`);
+    // Optionally log them out if you implement real sessions
   };
 
-  // Initial call
-  showScreen();
+  // Ban screen & appeal button
+  function showBanned() {
+    bannedScreen.style.display = 'flex';
+  }
+  appealBtn.onclick = () => {
+    alert('Appeal sent! Admins will review your case.');
+  };
 
+  // Initial check
+  if (bannedIPs.includes(visitorIP)) {
+    showBanned();
+  }
+})();
 </script>
-
-<style>
-  /* Basic fade-in animation */
-  .fade-in {
-    opacity: 1 !important;
-    transform: translateY(0) !important;
-    transition: opacity 0.5s ease, transform 0.5s ease;
-  }
-  .shop-item {
-    opacity: 0;
-    transform: translateY(20px);
-    transition: opacity 0.5s ease, transform 0.5s ease;
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 10px;
-    padding: 8px;
-    border: 1px solid #aaa;
-    border-radius: 5px;
-  }
-  #bannedScreen {
-    text-align: center;
-    padding: 40px;
-    border: 2px solid red;
-    background: #fee;
-    border-radius: 10px;
-    margin: 30px auto;
-    max-width: 400px;
-    box-shadow: 0 0 15px red;
-  }
-  button {
-    cursor: pointer;
-    padding: 6px 10px;
-    margin: 5px;
-    border-radius: 4px;
-    border: none;
-    background-color: #007BFF;
-    color: white;
-    font-weight: bold;
-  }
-  button:hover {
-    background-color: #0056b3;
-  }
-</style>
+</body>
+</html>
