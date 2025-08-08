@@ -3,226 +3,248 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Money Game</title>
+<title>Simple Game</title>
 <style>
-  /* Reset & base */
+  /* Reset */
   * {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
+    margin: 0; padding: 0; box-sizing: border-box;
   }
   body, html {
     height: 100%;
-    background: #fff;
+    background: #fefefe;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    color: #222;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    display: flex; justify-content: center; align-items: center;
     padding: 20px;
   }
+
   #app {
-    width: 360px;
-    background: #f9f9f9;
-    border-radius: 15px;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.12);
-    padding: 25px;
-    text-align: center;
-    overflow: hidden;
+    width: 450px;
+    background: #ffffff;
+    border-radius: 20px;
+    box-shadow: 0 12px 40px rgba(0,0,0,0.15);
+    padding: 30px;
     position: relative;
+    overflow: hidden;
   }
 
-  h1 {
-    margin-bottom: 15px;
+  h1, h2 {
+    text-align: center;
+    color: #222;
     font-weight: 700;
-    color: #333;
+    margin-bottom: 20px;
+    user-select: none;
   }
 
-  input, button, select {
-    border-radius: 12px;
-    border: 1.5px solid #ddd;
-    padding: 10px 15px;
-    font-size: 1rem;
-    margin: 8px 0;
+  input, select, button {
     width: 100%;
-    transition: border-color 0.3s ease;
-  }
-  input:focus, select:focus {
-    outline: none;
-    border-color: #007BFF;
-  }
-  button {
-    background-color: #007BFF;
-    border: none;
-    color: white;
+    padding: 12px 15px;
+    border-radius: 14px;
+    border: 2px solid #ddd;
+    margin: 10px 0;
+    font-size: 1rem;
     font-weight: 600;
+    transition: border-color 0.4s ease, background-color 0.3s ease;
+  }
+
+  input:focus, select:focus {
+    border-color: #007bff;
+    outline: none;
+    box-shadow: 0 0 8px rgba(0,123,255,0.5);
+  }
+
+  button {
+    background-color: #007bff;
+    color: white;
     cursor: pointer;
+    font-weight: 700;
     user-select: none;
-    transition: background-color 0.25s ease;
+    border: none;
+    transition: background-color 0.25s ease, transform 0.15s ease;
   }
   button:hover {
     background-color: #0056b3;
+    transform: scale(1.05);
+  }
+  button:active {
+    transform: scale(0.95);
   }
 
-  .fade-slide {
-    opacity: 0;
-    transform: translateY(15px);
-    animation-fill-mode: forwards;
-    animation-duration: 0.5s;
-    animation-timing-function: cubic-bezier(0.4,0,0.2,1);
-  }
-  .fade-slide.show {
-    animation-name: fadeInSlideUp;
-  }
-  @keyframes fadeInSlideUp {
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-
-  #moneyDisplay {
-    font-size: 1.5rem;
-    font-weight: 700;
-    margin: 15px 0;
-    color: #007BFF;
-  }
-
-  #log {
-    height: 110px;
-    background: #fff;
-    border: 1.5px solid #ddd;
-    border-radius: 12px;
+  /* Scrollable logs */
+  #log, #adminLogs, #userListContainer {
+    background: #fafafa;
+    border: 2px solid #ddd;
+    border-radius: 16px;
+    padding: 12px;
+    max-height: 150px;
     overflow-y: auto;
-    text-align: left;
-    padding: 10px;
+    font-family: monospace;
     font-size: 0.9rem;
     color: #555;
     margin-top: 15px;
   }
 
-  /* Shop styling */
-  #shop {
+  /* User List */
+  #userListContainer {
     margin-top: 15px;
-    text-align: left;
   }
-  .shop-item {
-    background: #fff;
-    margin-bottom: 10px;
-    padding: 12px 15px;
-    border-radius: 12px;
+  #userList li {
+    list-style: none;
+    padding: 10px 14px;
+    margin-bottom: 8px;
+    border-radius: 14px;
+    background: #e1f0ff;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    user-select: none;
+    font-weight: 600;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    border: 1.5px solid #ddd;
-    cursor: pointer;
-    user-select: none;
-    transition: box-shadow 0.3s ease, border-color 0.3s ease;
   }
-  .shop-item:hover {
-    box-shadow: 0 4px 10px rgba(0,123,255,0.2);
-    border-color: #007BFF;
+  #userList li.selected {
+    background: #c6dbff;
   }
-  .shop-item > span {
-    font-weight: 600;
-    color: #333;
-  }
-  .shop-item > button {
-    width: auto;
-    padding: 6px 12px;
-  }
-
-  /* Admin Panel */
-  #adminPanel {
-    margin-top: 20px;
-    background: #eef5ff;
-    border-radius: 15px;
-    padding: 15px;
-    max-height: 250px;
-    overflow-y: auto;
-    text-align: left;
-    font-size: 0.9rem;
-    color: #222;
-  }
-  #adminPanel h2 {
-    text-align: center;
-    margin-bottom: 10px;
+  #userList li.admin {
+    font-weight: 900;
     color: #004085;
   }
-  .user-list {
-    list-style: none;
-    padding-left: 0;
-    margin-bottom: 10px;
-  }
-  .user-list li {
-    padding: 6px 8px;
-    border-radius: 10px;
-    background: #d1e7ff;
-    margin-bottom: 5px;
-    cursor: pointer;
-    user-select: none;
-    transition: background-color 0.25s ease;
-  }
-  .user-list li:hover {
-    background: #a9d1ff;
+  #userList li.banned {
+    text-decoration: line-through;
+    color: #b00020;
   }
 
-  /* Banned Screen */
+  /* Shop items */
+  .shop-item {
+    background: #f0f8ff;
+    border-radius: 16px;
+    padding: 14px 18px;
+    margin: 12px 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    user-select: none;
+    border: 2px solid #ddd;
+    transition: border-color 0.4s ease, box-shadow 0.3s ease;
+  }
+  .shop-item:hover {
+    border-color: #007bff;
+    box-shadow: 0 0 15px rgba(0,123,255,0.3);
+  }
+  .shop-item span {
+    font-weight: 700;
+    font-size: 1.05rem;
+  }
+  .shop-item button {
+    width: auto;
+    padding: 8px 14px;
+    font-weight: 700;
+  }
+
+  /* Money display */
+  #moneyDisplay {
+    font-weight: 900;
+    font-size: 1.5rem;
+    margin: 15px 0;
+    color: #007bff;
+    user-select: none;
+  }
+
+  /* Banned overlay */
   #bannedScreen {
     position: absolute;
     inset: 0;
-    background: rgba(255, 255, 255, 0.95);
-    border-radius: 15px;
+    background: rgba(255,255,255,0.98);
+    border-radius: 20px;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
     text-align: center;
     color: #b00020;
-    font-weight: 700;
-    font-size: 1.3rem;
-    box-shadow: 0 0 15px red;
+    font-weight: 900;
+    font-size: 1.4rem;
+    box-shadow: 0 0 25px red;
     padding: 30px;
-    z-index: 99;
+    z-index: 100;
   }
   #bannedScreen button {
-    margin-top: 20px;
+    margin-top: 25px;
     background-color: #b00020;
+    padding: 12px 20px;
+    font-weight: 700;
+    transition: background-color 0.3s ease;
   }
   #bannedScreen button:hover {
     background-color: #7a0015;
   }
+
+  /* Animations */
+  @keyframes fadeInSlideUp {
+    0% {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .fade-slide {
+    opacity: 0;
+    animation-fill-mode: forwards;
+    animation-name: fadeInSlideUp;
+    animation-duration: 0.7s;
+    animation-timing-function: cubic-bezier(0.4,0,0.2,1);
+  }
+  .fade-slide:nth-child(1) { animation-delay: 0.1s; }
+  .fade-slide:nth-child(2) { animation-delay: 0.25s; }
+  .fade-slide:nth-child(3) { animation-delay: 0.4s; }
+  .fade-slide:nth-child(4) { animation-delay: 0.55s; }
+  .fade-slide:nth-child(5) { animation-delay: 0.7s; }
+  .fade-slide:nth-child(6) { animation-delay: 0.85s; }
+  .fade-slide:nth-child(7) { animation-delay: 1s; }
+
 </style>
 </head>
 <body>
-<div id="app" class="fade-slide show">
-  <h1>Simple Game</h1>
 
-  <div id="loginScreen">
+<div id="app" class="fade-slide">
+  <h1>Simple Game & Admin Panel</h1>
+
+  <!-- Login Screen -->
+  <div id="loginScreen" class="fade-slide">
     <input id="username" placeholder="Username" autocomplete="off" />
     <input id="password" type="password" placeholder="Password" autocomplete="off" />
     <button id="loginBtn">Login</button>
     <button id="signupBtn">Sign Up</button>
   </div>
 
-  <div id="gameScreen" style="display:none;">
+  <!-- Game Screen -->
+  <div id="gameScreen" style="display:none;" class="fade-slide">
     <div id="moneyDisplay">Money: $0</div>
-
     <div id="shop"></div>
-
-    <div id="log"></div>
+    <div id="log" aria-label="Game logs"></div>
   </div>
 
-  <div id="adminPanel" style="display:none;">
+  <!-- Admin Panel -->
+  <div id="adminPanel" style="display:none;" class="fade-slide">
     <h2>Admin Panel</h2>
-    <ul class="user-list" id="userList"></ul>
+
+    <div id="userListContainer">
+      <ul id="userList" aria-label="User List"></ul>
+    </div>
+
     <input id="adminMoneyInput" type="number" min="1" placeholder="Money amount" />
     <button id="giveMoneyBtn">Give Money</button>
     <button id="banUserBtn">Ban User</button>
-    <div id="adminLogs" style="margin-top:10px; font-size:0.8rem; color:#555; max-height:100px; overflow-y:auto; background:#fff; padding:8px; border-radius:12px; border:1.5px solid #ccc;"></div>
+
+    <div id="adminLogs" aria-label="Admin Logs"></div>
   </div>
 
-  <div id="bannedScreen" style="display:none;">
+  <!-- Banned Screen -->
+  <div id="bannedScreen" style="display:none;" class="fade-slide">
     <div>You have been banned from this site.</div>
     <button id="appealBtn">Apply for Appeal</button>
   </div>
@@ -230,167 +252,296 @@
 
 <script>
 (() => {
-  // State
-  let users = JSON.parse(localStorage.getItem('users')) || [];
-  let bannedIPs = JSON.parse(localStorage.getItem('bannedIPs')) || [];
-  let adminLogs = [];
-  let currentUser = null;
-  const visitorIP = 'mocked-ip'; // Replace this with real IP detection if backend is used
+  // Utility to get fake IP for demo — replace with real IP fetching from backend in prod
+  const visitorIP = '192.168.1.100';
 
-  // Elements
+  // Storage keys
+  const USERS_KEY = 'users';
+  const BANNED_IPS_KEY = 'banned_ips';
+  const LOGS_KEY = 'logs';
+  const ADMIN_LOGS_KEY = 'admin_logs';
+
+  // Initial setup for localStorage if not exists
+  if (!localStorage.getItem(USERS_KEY)) {
+    // default admin user: admin/admin
+    localStorage.setItem(USERS_KEY, JSON.stringify({
+      admin: {password: 'admin', money: 0, isAdmin: true, banned: false, ip: '127.0.0.1'},
+    }));
+  }
+  if (!localStorage.getItem(BANNED_IPS_KEY)) {
+    localStorage.setItem(BANNED_IPS_KEY, JSON.stringify([]));
+  }
+  if (!localStorage.getItem(LOGS_KEY)) {
+    localStorage.setItem(LOGS_KEY, JSON.stringify([]));
+  }
+  if (!localStorage.getItem(ADMIN_LOGS_KEY)) {
+    localStorage.setItem(ADMIN_LOGS_KEY, JSON.stringify([]));
+  }
+
+  // State variables
+  let users = JSON.parse(localStorage.getItem(USERS_KEY));
+  let bannedIPs = JSON.parse(localStorage.getItem(BANNED_IPS_KEY));
+  let logs = JSON.parse(localStorage.getItem(LOGS_KEY));
+  let adminLogs = JSON.parse(localStorage.getItem(ADMIN_LOGS_KEY));
+
+  let currentUser = null;
+  let selectedUser = null;
+  let moneyInterval = null;
+
+  // DOM refs
   const loginScreen = document.getElementById('loginScreen');
   const gameScreen = document.getElementById('gameScreen');
   const adminPanel = document.getElementById('adminPanel');
   const bannedScreen = document.getElementById('bannedScreen');
+
+  const usernameInput = document.getElementById('username');
+  const passwordInput = document.getElementById('password');
+  const loginBtn = document.getElementById('loginBtn');
+  const signupBtn = document.getElementById('signupBtn');
+
   const moneyDisplay = document.getElementById('moneyDisplay');
-  const shop = document.getElementById('shop');
-  const log = document.getElementById('log');
+  const shopDiv = document.getElementById('shop');
+  const logDiv = document.getElementById('log');
+
   const userList = document.getElementById('userList');
   const adminMoneyInput = document.getElementById('adminMoneyInput');
-  const adminLogsElem = document.getElementById('adminLogs');
+  const giveMoneyBtn = document.getElementById('giveMoneyBtn');
+  const banUserBtn = document.getElementById('banUserBtn');
+  const adminLogsDiv = document.getElementById('adminLogs');
+
   const appealBtn = document.getElementById('appealBtn');
 
-  // Simple shop items
+  // Shop items (simple example)
   const shopItems = [
-    { id: 'item1', name: 'Speed Boost', price: 5 },
-    { id: 'item2', name: 'Double Money', price: 10 },
-    { id: 'item3', name: 'VIP Badge', price: 20 },
+    { id: 1, name: 'Small Boost (+10 money)', price: 50, effect: (user) => { user.money += 10; log(`You bought Small Boost! +10 money.`); } },
+    { id: 2, name: 'Big Boost (+50 money)', price: 200, effect: (user) => { user.money += 50; log(`You bought Big Boost! +50 money.`); } },
+    { id: 3, name: 'Super Boost (+150 money)', price: 500, effect: (user) => { user.money += 150; log(`You bought Super Boost! +150 money.`); } },
   ];
 
-  // Utility functions
-  function saveUsers() {
-    localStorage.setItem('users', JSON.stringify(users));
+  // Logging helpers
+  function log(msg) {
+    const timestamp = new Date().toLocaleTimeString();
+    logs.push(`[${timestamp}] ${msg}`);
+    if (logs.length > 50) logs.shift();
+    localStorage.setItem(LOGS_KEY, JSON.stringify(logs));
+    renderLogs();
   }
-  function saveBannedIPs() {
-    localStorage.setItem('bannedIPs', JSON.stringify(bannedIPs));
+  function adminLog(msg) {
+    const timestamp = new Date().toLocaleTimeString();
+    adminLogs.push(`[${timestamp}] ${msg}`);
+    if (adminLogs.length > 100) adminLogs.shift();
+    localStorage.setItem(ADMIN_LOGS_KEY, JSON.stringify(adminLogs));
+    renderAdminLogs();
   }
-  function addLog(message) {
-    const entry = `${new Date().toLocaleTimeString()}: ${message}`;
-    log.textContent = entry + '\n' + log.textContent;
-    if (log.textContent.length > 1000) log.textContent = log.textContent.slice(0, 1000);
+
+  function renderLogs() {
+    logDiv.innerHTML = logs.map(l => `<div>${l}</div>`).join('');
   }
-  function addAdminLog(message) {
-    adminLogs.unshift(`${new Date().toLocaleTimeString()}: ${message}`);
-    adminLogsElem.textContent = adminLogs.slice(0, 20).join('\n');
+  function renderAdminLogs() {
+    adminLogsDiv.innerHTML = adminLogs.map(l => `<div>${l}</div>`).join('');
   }
-  function updateMoneyDisplay() {
-    moneyDisplay.textContent = `Money: $${currentUser.money}`;
-  }
-  function renderShop() {
-    shop.innerHTML = '';
-    shopItems.forEach(item => {
-      const div = document.createElement('div');
-      div.className = 'shop-item';
-      div.innerHTML = `<span>${item.name} - $${item.price}</span><button data-id="${item.id}">Buy</button>`;
-      div.querySelector('button').onclick = () => {
-        if (currentUser.money >= item.price) {
-          currentUser.money -= item.price;
-          saveUsers();
-          updateMoneyDisplay();
-          addLog(`Bought ${item.name} for $${item.price}`);
-          addAdminLog(`${currentUser.username} bought ${item.name}`);
-        } else {
-          addLog(`Not enough money for ${item.name}`);
-        }
-      };
-      shop.appendChild(div);
-    });
-  }
+
+  // User list render with selection
   function renderUserList() {
     userList.innerHTML = '';
-    users.forEach(u => {
+    Object.keys(users).forEach(username => {
+      const u = users[username];
       const li = document.createElement('li');
-      li.textContent = u.username;
-      li.onclick = () => {
-        selectedUser = u;
-        userList.querySelectorAll('li').forEach(el => el.style.backgroundColor = '');
-        li.style.backgroundColor = '#a9d1ff';
-      };
+      li.textContent = username + (u.isAdmin ? ' (Admin)' : '');
+      li.classList.toggle('admin', u.isAdmin);
+      li.classList.toggle('banned', u.banned);
+      if (selectedUser === username) {
+        li.classList.add('selected');
+      }
+      li.addEventListener('click', () => {
+        selectedUser = username;
+        renderUserList();
+        adminLog(`Selected user: ${username}`);
+      });
       userList.appendChild(li);
     });
   }
 
-  // Login & Signup
-  document.getElementById('loginBtn').onclick = () => {
-    const username = document.getElementById('username').value.trim();
-    const password = document.getElementById('password').value;
-    if (!username || !password) return alert('Please enter username & password');
-    if (bannedIPs.includes(visitorIP)) {
-      showBanned();
+  // Show appropriate screens
+  function showScreen(screen) {
+    loginScreen.style.display = 'none';
+    gameScreen.style.display = 'none';
+    adminPanel.style.display = 'none';
+    bannedScreen.style.display = 'none';
+
+    screen.style.display = 'block';
+  }
+
+  // Check banned IP
+  function checkBan(ip) {
+    return bannedIPs.includes(ip);
+  }
+
+  // Start money interval
+  function startMoneyInterval() {
+    if (moneyInterval) clearInterval(moneyInterval);
+    moneyInterval = setInterval(() => {
+      if (!currentUser) return;
+      if (users[currentUser].banned) return;
+
+      users[currentUser].money++;
+      moneyDisplay.textContent = `Money: $${users[currentUser].money}`;
+      localStorage.setItem(USERS_KEY, JSON.stringify(users));
+      log(`You earned $1! Total: $${users[currentUser].money}`);
+    }, 30000);
+  }
+
+  // Build shop UI
+  function buildShop() {
+    shopDiv.innerHTML = '';
+    shopItems.forEach(item => {
+      const div = document.createElement('div');
+      div.className = 'shop-item fade-slide';
+      div.innerHTML = `<span>${item.name} - $${item.price}</span><button>Buy</button>`;
+      const btn = div.querySelector('button');
+      btn.addEventListener('click', () => {
+        if (users[currentUser].money >= item.price) {
+          users[currentUser].money -= item.price;
+          item.effect(users[currentUser]);
+          moneyDisplay.textContent = `Money: $${users[currentUser].money}`;
+          localStorage.setItem(USERS_KEY, JSON.stringify(users));
+          log(`Bought ${item.name} for $${item.price}`);
+        } else {
+          log(`Not enough money to buy ${item.name}!`);
+        }
+      });
+      shopDiv.appendChild(div);
+    });
+  }
+
+  // Login handler
+  loginBtn.addEventListener('click', () => {
+    const user = usernameInput.value.trim();
+    const pass = passwordInput.value.trim();
+
+    if (!user || !pass) {
+      alert('Enter username and password');
       return;
     }
-    const user = users.find(u => u.username === username && u.password === password);
-    if (!user) return alert('Invalid credentials');
-    currentUser = user;
-    afterLogin();
-  };
-  document.getElementById('signupBtn').onclick = () => {
-    const username = document.getElementById('username').value.trim();
-    const password = document.getElementById('password').value;
-    if (!username || !password) return alert('Please enter username & password');
-    if (users.find(u => u.username === username)) return alert('Username already taken');
-    const newUser = { username, password, money: 0, isAdmin: false };
-    users.push(newUser);
-    saveUsers();
-    alert('Account created! Please login.');
-  };
+    if (!users[user]) {
+      alert('User does not exist. Please sign up.');
+      return;
+    }
+    if (users[user].password !== pass) {
+      alert('Incorrect password');
+      return;
+    }
+    if (users[user].banned) {
+      alert('You are banned! Cannot login.');
+      return;
+    }
 
-  // After login setup
-  let selectedUser = null;
-  function afterLogin() {
-    loginScreen.style.display = 'none';
-    gameScreen.style.display = 'block';
-    updateMoneyDisplay();
-    renderShop();
-    addLog('Welcome ' + currentUser.username);
-    if (currentUser.isAdmin) {
-      adminPanel.style.display = 'block';
+    currentUser = user;
+    log(`User ${user} logged in`);
+    startApp();
+  });
+
+  // Signup handler
+  signupBtn.addEventListener('click', () => {
+    const user = usernameInput.value.trim();
+    const pass = passwordInput.value.trim();
+
+    if (!user || !pass) {
+      alert('Enter username and password');
+      return;
+    }
+    if (users[user]) {
+      alert('User already exists');
+      return;
+    }
+    users[user] = { password: pass, money: 0, isAdmin: false, banned: false, ip: visitorIP };
+    localStorage.setItem(USERS_KEY, JSON.stringify(users));
+    log(`User ${user} signed up`);
+    alert('Signup successful! You can login now.');
+  });
+
+  // Admin give money button
+  giveMoneyBtn.addEventListener('click', () => {
+    if (!selectedUser) {
+      alert('Select a user from the list first!');
+      return;
+    }
+    const amount = parseInt(adminMoneyInput.value);
+    if (isNaN(amount) || amount <= 0) {
+      alert('Enter a valid positive money amount');
+      return;
+    }
+    if (!users[selectedUser]) {
+      alert('Selected user not found');
+      return;
+    }
+    users[selectedUser].money += amount;
+    localStorage.setItem(USERS_KEY, JSON.stringify(users));
+    adminLog(`Gave $${amount} to ${selectedUser}`);
+    renderUserList();
+  });
+
+  // Admin ban user button
+  banUserBtn.addEventListener('click', () => {
+    if (!selectedUser) {
+      alert('Select a user from the list first!');
+      return;
+    }
+    if (selectedUser === currentUser) {
+      alert('You cannot ban yourself!');
+      return;
+    }
+    if (!users[selectedUser]) {
+      alert('Selected user not found');
+      return;
+    }
+    users[selectedUser].banned = true;
+    // Ban user's IP
+    if (!bannedIPs.includes(users[selectedUser].ip)) {
+      bannedIPs.push(users[selectedUser].ip);
+      localStorage.setItem(BANNED_IPS_KEY, JSON.stringify(bannedIPs));
+    }
+    localStorage.setItem(USERS_KEY, JSON.stringify(users));
+    adminLog(`Banned user ${selectedUser} and their IP: ${users[selectedUser].ip}`);
+    renderUserList();
+  });
+
+  // Appeal button (admins only, but banned users see it)
+  appealBtn.addEventListener('click', () => {
+    alert('Appeal request sent! Admins will review soon.');
+    adminLog(`Appeal request received from banned IP ${visitorIP}`);
+  });
+
+  // Render everything for user
+  function startApp() {
+    if (!currentUser) return;
+
+    if (checkBan(visitorIP) || users[currentUser].banned) {
+      showScreen(bannedScreen);
+      return;
+    }
+
+    if (users[currentUser].isAdmin) {
+      showScreen(adminPanel);
       renderUserList();
+      renderAdminLogs();
+    } else {
+      showScreen(gameScreen);
+      moneyDisplay.textContent = `Money: $${users[currentUser].money}`;
+      buildShop();
+      renderLogs();
+      startMoneyInterval();
     }
   }
 
-  // Money increment every 30 seconds
-  setInterval(() => {
-    if (!currentUser) return;
-    currentUser.money++;
-    saveUsers();
-    updateMoneyDisplay();
-  }, 30000);
-
-  // Admin panel buttons
-  document.getElementById('giveMoneyBtn').onclick = () => {
-    if (!selectedUser) return alert('Select a user first');
-    const amount = parseInt(adminMoneyInput.value);
-    if (isNaN(amount) || amount <= 0) return alert('Enter a valid amount');
-    selectedUser.money += amount;
-    saveUsers();
-    addAdminLog(`Gave $${amount} to ${selectedUser.username}`);
-    if (selectedUser.username === currentUser.username) updateMoneyDisplay();
-    renderUserList();
-  };
-  document.getElementById('banUserBtn').onclick = () => {
-    if (!selectedUser) return alert('Select a user first');
-    if (selectedUser.isAdmin) return alert('Cannot ban admin');
-    bannedIPs.push(visitorIP); // Note: This is just demo; ideally ban by IP of selected user
-    saveBannedIPs();
-    addAdminLog(`Banned user ${selectedUser.username}`);
-    alert(`User ${selectedUser.username} has been banned.`);
-    // Optionally log them out if you implement real sessions
-  };
-
-  // Ban screen & appeal button
-  function showBanned() {
-    bannedScreen.style.display = 'flex';
-  }
-  appealBtn.onclick = () => {
-    alert('Appeal sent! Admins will review your case.');
-  };
-
-  // Initial check
-  if (bannedIPs.includes(visitorIP)) {
-    showBanned();
+  // On load check if IP banned
+  if (checkBan(visitorIP)) {
+    showScreen(bannedScreen);
+  } else {
+    showScreen(loginScreen);
   }
 })();
 </script>
+
 </body>
 </html>
