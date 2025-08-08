@@ -11,17 +11,20 @@
   }
   body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: #f2f7f5;
+    background: #121212;
     margin: 0;
     padding: 0;
     display: flex;
     flex-direction: column;
     align-items: center;
     min-height: 100vh;
-    color: #333;
+    color: #eee;
+    overflow-x: hidden;
   }
   header {
-    background: #4caf50;
+    background: linear-gradient(45deg, #00ff88, #00c6ff, #ff00f7, #ff7700);
+    background-size: 400% 400%;
+    animation: gradientBG 15s ease infinite;
     width: 100%;
     max-width: 900px;
     padding: 12px 20px;
@@ -32,9 +35,16 @@
     justify-content: space-between;
     align-items: center;
     border-radius: 0 0 12px 12px;
+    box-shadow: 0 0 18px rgba(255, 255, 255, 0.15);
+  }
+  @keyframes gradientBG {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
   }
   header h1 {
     margin: 0;
+    text-shadow: 0 0 8px #00ffbb;
   }
   #topButtons {
     display: flex;
@@ -42,100 +52,98 @@
   }
   button {
     cursor: pointer;
-    background-color: #388e3c;
+    background: linear-gradient(135deg, #0fffc1, #00bfff);
     border: none;
     color: white;
     font-weight: 600;
     padding: 8px 16px;
-    border-radius: 12px;
+    border-radius: 20px;
     font-size: 16px;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
-    transition: background-color 0.3s ease, transform 0.2s ease;
+    box-shadow:
+      0 0 6px #00fff2,
+      0 0 12px #00fff2;
+    transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
   }
   button:hover:not(:disabled) {
-    background-color: #2e7d32;
-    transform: scale(1.05);
+    background: linear-gradient(135deg, #00f8c6, #007aff);
+    transform: scale(1.1);
+    box-shadow:
+      0 0 12px #00fff2,
+      0 0 25px #00fff2;
   }
   button:disabled {
-    opacity: 0.6;
+    opacity: 0.5;
     cursor: not-allowed;
+    box-shadow: none;
   }
   main {
-    background: white;
+    background: #1a1a1a;
     margin-top: 20px;
     width: 100%;
     max-width: 900px;
     border-radius: 16px;
     padding: 24px;
-    box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+    box-shadow: 0 6px 15px rgba(0,255,200,0.15);
     display: flex;
     flex-direction: column;
     gap: 24px;
-  }
-  #catContainer {
-    display: flex;
-    justify-content: center;
-    flex-wrap: wrap;
-    gap: 14px;
-  }
-  #catContainer img {
-    width: 90px;
-    height: 90px;
-    border-radius: 16px;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
-    transition: transform 0.5s ease;
-    animation: float 6s ease-in-out infinite;
-  }
-  @keyframes float {
-    0%, 100% { transform: translateY(0) }
-    50% { transform: translateY(-10px) }
+    position: relative;
+    overflow: visible;
   }
   #moneyDisplay {
-    font-size: 22px;
+    font-size: 24px;
     font-weight: 700;
     text-align: center;
+    color: #00ffcc;
+    text-shadow: 0 0 12px #00ffe1;
   }
   #secondsDisplay {
     font-size: 16px;
-    color: #555;
+    color: #66fff9;
     text-align: center;
+    font-weight: 600;
   }
   #shopSection {
-    border-top: 2px solid #4caf50;
+    border-top: 2px solid #00ffcc;
     padding-top: 12px;
     display: none; /* hidden until implemented */
+    color: #00eebb;
   }
   #shopSection h2 {
     margin: 0 0 12px 0;
-    color: #4caf50;
+    color: #00ffcc;
     font-weight: 700;
   }
   /* Admin Panel */
   #adminPanel {
-    background: #e8f5e9;
+    background: #003322;
     border-radius: 16px;
     padding: 18px;
     display: none;
     flex-direction: column;
     gap: 18px;
+    color: #0fffd8;
+    box-shadow: 0 0 12px #00ffccaa inset;
   }
   #adminPanel h2 {
     margin: 0 0 10px 0;
-    color: #2e7d32;
+    color: #00ffcc;
+    text-shadow: 0 0 8px #00ffcc;
   }
   #playersList, #logsList {
-    background: white;
+    background: #002211;
     border-radius: 12px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 8px #00ffaa44;
     padding: 10px 14px;
     max-height: 180px;
     overflow-y: auto;
     font-family: monospace;
     font-size: 14px;
+    color: #88ffee;
   }
   #playersList li {
     padding: 4px 0;
-    border-bottom: 1px solid #eee;
+    border-bottom: 1px solid #00553344;
   }
   #playersList li:last-child {
     border-bottom: none;
@@ -148,15 +156,20 @@
   #banPlayerSection input {
     padding: 8px 12px;
     border-radius: 12px;
-    border: 1.5px solid #4caf50;
+    border: 1.5px solid #00ffaa;
     font-size: 14px;
     flex-grow: 1;
+    background: #001a0f;
+    color: #00ffcc;
   }
   #banPlayerSection button {
-    background-color: #d32f2f;
+    background-color: #ff4444;
+    box-shadow: 0 0 8px #ff2222;
+    font-weight: 700;
   }
   #banPlayerSection button:hover {
-    background-color: #b71c1c;
+    background-color: #dd2222;
+    box-shadow: 0 0 14px #ff0000;
   }
   /* Popups */
   #popup {
@@ -164,34 +177,36 @@
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    background: #f44336;
+    background: #ff0044;
     color: white;
     padding: 28px 42px;
     border-radius: 20px;
     font-weight: 700;
     font-size: 18px;
-    box-shadow: 0 8px 20px rgba(244,67,54,0.8);
+    box-shadow: 0 8px 20px rgba(255,0,68,0.8);
     display: none;
     z-index: 1000;
+    text-align: center;
   }
   /* Login/SignIn modals */
   .modalBackdrop {
     position: fixed;
     top: 0; left: 0; right: 0; bottom: 0;
-    background: rgba(0,0,0,0.4);
+    background: rgba(0,0,0,0.85);
     display: none;
     align-items: center;
     justify-content: center;
     z-index: 10000;
   }
   .modal {
-    background: white;
+    background: #121212;
     border-radius: 18px;
     padding: 24px 32px;
     width: 320px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    box-shadow: 0 10px 30px #00ffaa;
     text-align: center;
     animation: fadeInScale 0.4s ease forwards;
+    color: #00ffaa;
   }
   @keyframes fadeInScale {
     0% {
@@ -205,22 +220,27 @@
   }
   .modal h2 {
     margin-bottom: 18px;
-    color: #4caf50;
+    color: #00ffaa;
   }
   .modal input {
     width: 100%;
     padding: 10px 14px;
     margin-bottom: 18px;
-    border: 1.8px solid #4caf50;
+    border: 1.8px solid #00ffaa;
     border-radius: 12px;
     font-size: 16px;
+    background: #002211;
+    color: #00ffaa;
+  }
+  .modal input::placeholder {
+    color: #00ffaaaa;
   }
   .modal button {
     width: 100%;
     padding: 12px 0;
     border-radius: 12px;
     border: none;
-    background-color: #4caf50;
+    background: linear-gradient(135deg, #00ffaa, #0088cc);
     color: white;
     font-weight: 700;
     font-size: 16px;
@@ -228,14 +248,68 @@
     transition: background-color 0.3s ease;
   }
   .modal button:hover {
-    background-color: #388e3c;
+    background: linear-gradient(135deg, #00ffcc, #00aaff);
   }
   .modal .closeBtn {
     margin-top: 14px;
-    background: #f44336;
+    background: #ff0044;
   }
   .modal .closeBtn:hover {
-    background: #d32f2f;
+    background: #dd0033;
+  }
+
+  /* Floating ball styles */
+  #floatingBall {
+    position: absolute;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: linear-gradient(45deg, #ff0055, #ffbb00, #00ffcc, #5500ff);
+    background-size: 400% 400%;
+    animation: rgbGlow 8s ease infinite;
+    box-shadow:
+      0 0 12px #ff00bb,
+      0 0 20px #ff00bb,
+      0 0 30px #ff00bb,
+      0 0 40px #00ffcc;
+    cursor: pointer;
+    user-select: none;
+    transition: transform 0.2s ease;
+    z-index: 50;
+  }
+  #floatingBall:active {
+    transform: scale(0.85);
+    box-shadow:
+      0 0 18px #ff55cc,
+      0 0 35px #ff55cc,
+      0 0 50px #55ffdd;
+  }
+
+  @keyframes rgbGlow {
+    0% {
+      background-position: 0% 50%;
+      box-shadow:
+        0 0 12px #ff00bb,
+        0 0 20px #ff00bb,
+        0 0 30px #ff00bb,
+        0 0 40px #00ffcc;
+    }
+    50% {
+      background-position: 100% 50%;
+      box-shadow:
+        0 0 12px #00ffcc,
+        0 0 20px #00ffcc,
+        0 0 30px #00ffcc,
+        0 0 40px #ff00bb;
+    }
+    100% {
+      background-position: 0% 50%;
+      box-shadow:
+        0 0 12px #ff00bb,
+        0 0 20px #ff00bb,
+        0 0 30px #ff00bb,
+        0 0 40px #00ffcc;
+    }
   }
 </style>
 </head>
@@ -244,52 +318,42 @@
 <header>
   <h1>Simple Money Game</h1>
   <div id="topButtons">
-    <button id="shopBtn">Shop</button>
     <button id="loginBtn">Log In</button>
     <button id="signInBtn">Sign Up</button>
-    <button id="logoutBtn" style="display:none;">Log Out</button>
+    <button id="logoutBtn" style="display:none;">Logout</button>
   </div>
 </header>
 
 <main>
-  <div id="moneyDisplay">Money: 0 💰</div>
+  <div id="moneyDisplay">Money: 0</div>
   <div id="secondsDisplay">Next +1 money in: 30 seconds</div>
-  <div id="catContainer"></div>
-
-  <section id="shopSection">
-    <h2>Shop (coming soon)</h2>
-    <p>Shop features are being developed...</p>
-  </section>
 
   <section id="adminPanel">
     <h2>Admin Panel</h2>
-
-    <div>
-      <h3>Players List</h3>
-      <ul id="playersList"></ul>
-    </div>
-
-    <div>
-      <h3>Logs</h3>
-      <ul id="logsList"></ul>
-    </div>
-
     <div id="banPlayerSection">
-      <input type="text" id="banInput" placeholder="Enter player username to ban" />
+      <input type="text" id="banInput" placeholder="Username to ban" />
       <button id="banBtn">Ban Player</button>
     </div>
+    <h3>Players List</h3>
+    <ul id="playersList"></ul>
+    <h3>Logs</h3>
+    <ul id="logsList"></ul>
+  </section>
+
+  <section id="shopSection">
+    <h2>Shop</h2>
+    <p>Coming Soon!</p>
   </section>
 </main>
 
-<!-- Popup for banned message -->
-<div id="popup">Error: This user is banned!</div>
+<div id="popup"></div>
 
 <!-- Login Modal -->
 <div id="loginModal" class="modalBackdrop">
-  <div class="modal">
-    <h2>Login</h2>
-    <input type="text" id="loginUsername" placeholder="Username" autocomplete="off" />
-    <input type="password" id="loginPassword" placeholder="Password" autocomplete="off" />
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="loginTitle">
+    <h2 id="loginTitle">Log In</h2>
+    <input type="text" id="loginUsername" placeholder="Username" autocomplete="username" />
+    <input type="password" id="loginPassword" placeholder="Password" autocomplete="current-password" />
     <button id="loginSubmit">Log In</button>
     <button class="closeBtn" id="loginClose">Cancel</button>
   </div>
@@ -297,317 +361,320 @@
 
 <!-- Sign Up Modal -->
 <div id="signInModal" class="modalBackdrop">
-  <div class="modal">
-    <h2>Sign Up</h2>
-    <input type="text" id="signInUsername" placeholder="Choose username" autocomplete="off" />
-    <input type="password" id="signInPassword" placeholder="Choose password" autocomplete="off" />
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="signInTitle">
+    <h2 id="signInTitle">Sign Up</h2>
+    <input type="text" id="signInUsername" placeholder="Username" autocomplete="username" />
+    <input type="password" id="signInPassword" placeholder="Password" autocomplete="new-password" />
     <button id="signInSubmit">Sign Up</button>
     <button class="closeBtn" id="signInClose">Cancel</button>
   </div>
 </div>
 
+<!-- Floating Ball -->
+<div id="floatingBall" title="Catch me for +5 money!"></div>
+
 <script>
 (() => {
-  // --- Data store in localStorage ---
-  const STORAGE_KEY = "simpleMoneyGameData";
-  const defaultData = {
-    users: {
-      // Pre-created admin
-      cow: { password: "cow", money: 0, banned: false, isAdmin: true },
-    },
-    logs: [],
-  };
-
-  // Load or init data
-  function loadData() {
-    const dataStr = localStorage.getItem(STORAGE_KEY);
-    if (!dataStr) {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(defaultData));
-      return JSON.parse(JSON.stringify(defaultData));
-    }
-    return JSON.parse(dataStr);
+  // Data
+  const STORAGE_KEY = 'simpleMoneyGameUsers';
+  const STORAGE_BANS = 'simpleMoneyGameBans';
+  let users = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
+  let bannedUsers = JSON.parse(localStorage.getItem(STORAGE_BANS) || '[]');
+  // Predefined admin user
+  if (!users['cow']) {
+    users['cow'] = { password: 'cow', money: 0, isAdmin: true };
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(users));
   }
-  function saveData() {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-  }
-
-  let data = loadData();
-
-  // --- UI Elements ---
-  const moneyDisplay = document.getElementById("moneyDisplay");
-  const secondsDisplay = document.getElementById("secondsDisplay");
-  const catContainer = document.getElementById("catContainer");
-  const popup = document.getElementById("popup");
-
-  const loginBtn = document.getElementById("loginBtn");
-  const signInBtn = document.getElementById("signInBtn");
-  const logoutBtn = document.getElementById("logoutBtn");
-  const shopBtn = document.getElementById("shopBtn");
-
-  const loginModal = document.getElementById("loginModal");
-  const signInModal = document.getElementById("signInModal");
-
-  const loginUsername = document.getElementById("loginUsername");
-  const loginPassword = document.getElementById("loginPassword");
-  const loginSubmit = document.getElementById("loginSubmit");
-  const loginClose = document.getElementById("loginClose");
-
-  const signInUsername = document.getElementById("signInUsername");
-  const signInPassword = document.getElementById("signInPassword");
-  const signInSubmit = document.getElementById("signInSubmit");
-  const signInClose = document.getElementById("signInClose");
-
-  const adminPanel = document.getElementById("adminPanel");
-  const playersList = document.getElementById("playersList");
-  const logsList = document.getElementById("logsList");
-  const banInput = document.getElementById("banInput");
-  const banBtn = document.getElementById("banBtn");
-
-  // --- State ---
   let currentUser = null;
-  let secondsToNextMoney = 30;
+
+  // UI Elements
+  const moneyDisplay = document.getElementById('moneyDisplay');
+  const secondsDisplay = document.getElementById('secondsDisplay');
+  const loginBtn = document.getElementById('loginBtn');
+  const signInBtn = document.getElementById('signInBtn');
+  const logoutBtn = document.getElementById('logoutBtn');
+  const loginModal = document.getElementById('loginModal');
+  const loginUsername = document.getElementById('loginUsername');
+  const loginPassword = document.getElementById('loginPassword');
+  const loginSubmit = document.getElementById('loginSubmit');
+  const loginClose = document.getElementById('loginClose');
+  const signInModal = document.getElementById('signInModal');
+  const signInUsername = document.getElementById('signInUsername');
+  const signInPassword = document.getElementById('signInPassword');
+  const signInSubmit = document.getElementById('signInSubmit');
+  const signInClose = document.getElementById('signInClose');
+  const adminPanel = document.getElementById('adminPanel');
+  const banInput = document.getElementById('banInput');
+  const banBtn = document.getElementById('banBtn');
+  const playersList = document.getElementById('playersList');
+  const logsList = document.getElementById('logsList');
+  const popup = document.getElementById('popup');
+  const floatingBall = document.getElementById('floatingBall');
+
+  // Money timer
   let moneyInterval = null;
-  let catInterval = null;
+  let secondsToNextMoney = 30;
 
-  // --- Cats ---
-  const catImages = [
-    "https://placekitten.com/100/100",
-    "https://placekitten.com/101/100",
-    "https://placekitten.com/102/100",
-    "https://placekitten.com/103/100",
-    "https://placekitten.com/104/100",
-    "https://placekitten.com/105/100",
-    "https://placekitten.com/106/100",
-    "https://placekitten.com/107/100",
-    "https://placekitten.com/108/100",
-    "https://placekitten.com/109/100",
-  ];
+  // Logs array
+  const logs = [];
 
-  function showCats() {
-    catContainer.innerHTML = "";
-    for (let i = 0; i < 10; i++) {
-      const img = document.createElement("img");
-      img.src = catImages[i];
-      img.alt = "Cat";
-      catContainer.appendChild(img);
-    }
+  // Functions
+  function saveUsers() {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(users));
   }
-
-  // --- Helpers ---
-  function logEvent(text) {
-    const timestamp = new Date().toLocaleTimeString();
-    data.logs.unshift(`[${timestamp}] ${text}`);
-    if (data.logs.length > 100) data.logs.pop();
-    saveData();
-    if (currentUser?.isAdmin) refreshLogs();
+  function saveBans() {
+    localStorage.setItem(STORAGE_BANS, JSON.stringify(bannedUsers));
   }
-
-  function refreshPlayersList() {
-    playersList.innerHTML = "";
-    for (const username in data.users) {
-      const user = data.users[username];
-      const li = document.createElement("li");
-      li.textContent = `${username} | Money: ${user.money} | Banned: ${user.banned ? "Yes" : "No"}`;
-      playersList.appendChild(li);
-    }
+  function addLog(message) {
+    const time = new Date().toLocaleTimeString();
+    logs.unshift(`[${time}] ${message}`);
+    if (logs.length > 100) logs.pop();
+    refreshLogs();
   }
   function refreshLogs() {
-    logsList.innerHTML = "";
-    for (const log of data.logs) {
-      const li = document.createElement("li");
+    logsList.innerHTML = '';
+    for (const log of logs) {
+      const li = document.createElement('li');
       li.textContent = log;
       logsList.appendChild(li);
     }
   }
+  function refreshPlayers() {
+    playersList.innerHTML = '';
+    for (const username in users) {
+      const li = document.createElement('li');
+      const isBanned = bannedUsers.includes(username);
+      li.textContent = `${username} - Money: ${users[username].money} ${isBanned ? '(BANNED)' : ''}`;
+      li.style.color = isBanned ? '#ff4444' : '#88ffee';
+      playersList.appendChild(li);
+    }
+  }
+  function showPopup(msg) {
+    popup.textContent = msg;
+    popup.style.display = 'block';
+    popup.style.opacity = '1';
+    setTimeout(() => {
+      popup.style.opacity = '0';
+      setTimeout(() => (popup.style.display = 'none'), 600);
+    }, 2200);
+  }
   function refreshUI() {
     if (!currentUser) {
-      moneyDisplay.textContent = "Money: 0 💰";
-      secondsDisplay.textContent = "Next +1 money in: 30 seconds";
-      adminPanel.style.display = "none";
-      loginBtn.style.display = "inline-block";
-      signInBtn.style.display = "inline-block";
-      logoutBtn.style.display = "none";
-      shopBtn.style.display = "inline-block";
+      moneyDisplay.textContent = 'Money: 0';
+      secondsDisplay.textContent = 'Next +1 money in: 30 seconds';
+      loginBtn.style.display = 'inline-block';
+      signInBtn.style.display = 'inline-block';
+      logoutBtn.style.display = 'none';
+      adminPanel.style.display = 'none';
       return;
     }
-    if (currentUser.banned) {
-      showPopup("Error: This user is banned!");
-      logoutUser();
-      return;
-    }
-    moneyDisplay.textContent = `Money: ${currentUser.money} 💰`;
+    moneyDisplay.textContent = `Money: ${currentUser.money}`;
     secondsDisplay.textContent = `Next +1 money in: ${secondsToNextMoney} seconds`;
-
-    loginBtn.style.display = "none";
-    signInBtn.style.display = "none";
-    logoutBtn.style.display = "inline-block";
-    shopBtn.style.display = "inline-block";
-
+    loginBtn.style.display = 'none';
+    signInBtn.style.display = 'none';
+    logoutBtn.style.display = 'inline-block';
     if (currentUser.isAdmin) {
-      adminPanel.style.display = "flex";
-      refreshPlayersList();
+      adminPanel.style.display = 'flex';
+      refreshPlayers();
       refreshLogs();
     } else {
-      adminPanel.style.display = "none";
+      adminPanel.style.display = 'none';
     }
   }
-  function showPopup(text) {
-    popup.textContent = text;
-    popup.style.display = "block";
-    setTimeout(() => {
-      popup.style.display = "none";
-    }, 4000);
-  }
-  // --- Login/Logout ---
   function loginUser(username, password) {
-    const user = data.users[username];
+    if (bannedUsers.includes(username)) {
+      showPopup('Error: This user is banned!');
+      return false;
+    }
+    const user = users[username];
     if (!user) {
-      showPopup("Invalid username!");
+      showPopup('User does not exist!');
       return false;
     }
     if (user.password !== password) {
-      showPopup("Incorrect password!");
-      return false;
-    }
-    if (user.banned) {
-      showPopup("Error: This user is banned!");
+      showPopup('Incorrect password!');
       return false;
     }
     currentUser = user;
     currentUser.username = username;
-    logEvent(`User logged in: ${username}`);
+    addLog(`${username} logged in`);
     refreshUI();
+    return true;
+  }
+  function signUpUser(username, password) {
+    if (users[username]) {
+      showPopup('User already exists!');
+      return false;
+    }
+    if (bannedUsers.includes(username)) {
+      showPopup('Error: This user is banned!');
+      return false;
+    }
+    users[username] = { password, money: 0, isAdmin: false };
+    saveUsers();
+    addLog(`${username} signed up`);
     return true;
   }
   function logoutUser() {
-    if (currentUser) logEvent(`User logged out: ${currentUser.username}`);
-    currentUser = null;
-    refreshUI();
-  }
-  function signUpUser(username, password) {
-    if (data.users[username]) {
-      showPopup("Username already exists!");
-      return false;
-    }
-    data.users[username] = { password, money: 0, banned: false, isAdmin: false };
-    saveData();
-    logEvent(`New user signed up: ${username}`);
-    showPopup("Sign up successful! You can now log in.");
-    return true;
-  }
-  // --- Ban User ---
-  function banUser(username) {
-    if (!data.users[username]) {
-      showPopup("User not found!");
-      return;
-    }
-    data.users[username].banned = true;
-    saveData();
-    logEvent(`User banned: ${username}`);
-    refreshPlayersList();
-    showPopup(`${username} has been banned.`);
-    if (currentUser?.username === username) {
-      logoutUser();
+    if (currentUser) {
+      addLog(`${currentUser.username} logged out`);
+      currentUser = null;
+      refreshUI();
     }
   }
-  // --- Money timer ---
-  function startMoneyInterval() {
+  function startMoneyTimer() {
     if (moneyInterval) clearInterval(moneyInterval);
+    secondsToNextMoney = 30;
+    refreshUI();
     moneyInterval = setInterval(() => {
-      if (!currentUser || currentUser.banned) return;
       secondsToNextMoney--;
       if (secondsToNextMoney <= 0) {
-        currentUser.money++;
-        data.users[currentUser.username].money = currentUser.money;
-        saveData();
+        if (currentUser) {
+          currentUser.money++;
+          users[currentUser.username].money = currentUser.money;
+          saveUsers();
+          addLog(`${currentUser.username} earned +1 money`);
+        }
         secondsToNextMoney = 30;
-        logEvent(`+1 money for ${currentUser.username}. Total: ${currentUser.money}`);
-        refreshUI();
-      } else {
-        secondsDisplay.textContent = `Next +1 money in: ${secondsToNextMoney} seconds`;
       }
+      refreshUI();
     }, 1000);
   }
-  // --- Cat images refresh ---
-  function startCatInterval() {
-    showCats();
-    if (catInterval) clearInterval(catInterval);
-    catInterval = setInterval(() => {
-      showCats();
-    }, 30000);
-  }
-  // --- Event Listeners ---
-  loginBtn.addEventListener("click", () => {
-    loginModal.style.display = "flex";
+
+  // Ban player
+  banBtn.addEventListener('click', () => {
+    const userToBan = banInput.value.trim();
+    if (!userToBan || !users[userToBan]) {
+      showPopup('User does not exist!');
+      return;
+    }
+    if (bannedUsers.includes(userToBan)) {
+      showPopup('User already banned!');
+      return;
+    }
+    bannedUsers.push(userToBan);
+    saveBans();
+    addLog(`Player banned: ${userToBan}`);
+    refreshPlayers();
+
+    if (currentUser && currentUser.username === userToBan) {
+      showPopup('You are banned!');
+      logoutUser();
+    }
+    banInput.value = '';
   });
-  loginClose.addEventListener("click", () => {
-    loginModal.style.display = "none";
-    loginUsername.value = "";
-    loginPassword.value = "";
+
+  // Login modal handlers
+  loginBtn.addEventListener('click', () => {
+    loginModal.style.display = 'flex';
+    loginUsername.value = '';
+    loginPassword.value = '';
+    loginUsername.focus();
   });
-  loginSubmit.addEventListener("click", () => {
+  loginClose.addEventListener('click', () => loginModal.style.display = 'none');
+  loginSubmit.addEventListener('click', () => {
     const u = loginUsername.value.trim();
     const p = loginPassword.value;
-    if (u && p) {
-      if (loginUser(u, p)) {
-        loginModal.style.display = "none";
-        loginUsername.value = "";
-        loginPassword.value = "";
-        startMoneyInterval();
-      }
-    } else {
-      showPopup("Please enter username and password.");
+    if (!u || !p) {
+      showPopup('Please fill in all fields');
+      return;
+    }
+    if (loginUser(u, p)) {
+      loginModal.style.display = 'none';
+      startMoneyTimer();
     }
   });
 
-  signInBtn.addEventListener("click", () => {
-    signInModal.style.display = "flex";
+  // Sign in modal handlers
+  signInBtn.addEventListener('click', () => {
+    signInModal.style.display = 'flex';
+    signInUsername.value = '';
+    signInPassword.value = '';
+    signInUsername.focus();
   });
-  signInClose.addEventListener("click", () => {
-    signInModal.style.display = "none";
-    signInUsername.value = "";
-    signInPassword.value = "";
-  });
-  signInSubmit.addEventListener("click", () => {
+  signInClose.addEventListener('click', () => signInModal.style.display = 'none');
+  signInSubmit.addEventListener('click', () => {
     const u = signInUsername.value.trim();
     const p = signInPassword.value;
-    if (u && p) {
-      if (signUpUser(u, p)) {
-        signInModal.style.display = "none";
-        signInUsername.value = "";
-        signInPassword.value = "";
-      }
-    } else {
-      showPopup("Please enter username and password.");
+    if (!u || !p) {
+      showPopup('Please fill in all fields');
+      return;
+    }
+    if (signUpUser(u, p)) {
+      signInModal.style.display = 'none';
+      showPopup('Sign up successful! Please log in.');
     }
   });
 
-  logoutBtn.addEventListener("click", () => {
+  // Logout
+  logoutBtn.addEventListener('click', () => {
     logoutUser();
+    clearInterval(moneyInterval);
   });
 
-  banBtn.addEventListener("click", () => {
-    const userToBan = banInput.value.trim();
-    if (!userToBan) {
-      showPopup("Enter username to ban.");
+  // Floating ball animation
+  let ballX = 100;
+  let ballY = 100;
+  let ballVX = 3 + Math.random() * 2;
+  let ballVY = 3 + Math.random() * 2;
+  const ballSpeed = 3;
+  const ballSize = 60;
+  function moveBall() {
+    const mainRect = document.querySelector('main').getBoundingClientRect();
+    ballX += ballVX;
+    ballY += ballVY;
+    if (ballX < 0) {
+      ballX = 0;
+      ballVX = -ballVX;
+    }
+    if (ballY < 0) {
+      ballY = 0;
+      ballVY = -ballVY;
+    }
+    if (ballX > mainRect.width - ballSize) {
+      ballX = mainRect.width - ballSize;
+      ballVX = -ballVX;
+    }
+    if (ballY > mainRect.height - ballSize) {
+      ballY = mainRect.height - ballSize;
+      ballVY = -ballVY;
+    }
+    floatingBall.style.transform = `translate(${ballX}px, ${ballY}px)`;
+  }
+  // Reset ball velocity randomly every 15 seconds for "hard to catch"
+  function resetBallSpeed() {
+    ballVX = (Math.random() * 6 + 2) * (Math.random() < 0.5 ? 1 : -1);
+    ballVY = (Math.random() * 6 + 2) * (Math.random() < 0.5 ? 1 : -1);
+  }
+  setInterval(resetBallSpeed, 15000);
+
+  // Animate ball every 16ms (~60fps)
+  function animate() {
+    moveBall();
+    requestAnimationFrame(animate);
+  }
+  animate();
+
+  // Clicking the ball gives +5 money
+  floatingBall.addEventListener('click', () => {
+    if (!currentUser) {
+      showPopup('Log in to earn money!');
       return;
     }
-    if (userToBan === currentUser?.username) {
-      showPopup("You cannot ban yourself!");
-      return;
-    }
-    banUser(userToBan);
-    banInput.value = "";
+    currentUser.money += 5;
+    users[currentUser.username].money = currentUser.money;
+    saveUsers();
+    addLog(`${currentUser.username} caught the floating ball and earned +5 money`);
+    refreshUI();
   });
 
-  shopBtn.addEventListener("click", () => {
-    alert("Shop is coming soon!");
-  });
-
-  // --- Initialization ---
+  // Initialization
   refreshUI();
-  startCatInterval();
-  startMoneyInterval();
+  startMoneyTimer();
+
+  // Start with no modal shown
+  loginModal.style.display = 'none';
+  signInModal.style.display = 'none';
 
 })();
 </script>
