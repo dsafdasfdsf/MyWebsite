@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Money Game + Ban + Shop + Cats</title>
+  <title>Simple Money Game</title>
   <style>
     /* Reset */
     * {
@@ -66,34 +66,15 @@
       gap: 28px;
       padding-bottom: 60px;
     }
-    #authForm, #gamePanel {
+    #gamePanel {
       background: white;
       padding: 30px 30px 36px;
       border-radius: 18px;
       box-shadow: 0 10px 25px rgb(0 0 0 / 0.05);
-      display: flex;
+      display: none;
       flex-direction: column;
       align-items: center;
       animation: fadeIn 0.5s ease forwards;
-    }
-    #authForm input {
-      padding: 12px 14px;
-      border-radius: 16px;
-      border: 1.8px solid #ccc;
-      width: 100%;
-      font-size: 1rem;
-      margin-bottom: 18px;
-      transition: border-color 0.3s ease;
-      outline-offset: 2px;
-    }
-    #authForm input:focus {
-      border-color: #4caf50;
-    }
-    #authForm button {
-      width: 100%;
-      margin-top: 10px;
-      font-size: 1.1rem;
-      box-shadow: 0 5px 15px rgb(76 175 80 / 0.4);
     }
     #welcomeMsg {
       font-weight: 700;
@@ -238,136 +219,173 @@
       0%, 100% {transform: translateY(0) scale(0.95);}
       50% {transform: translateY(-12px) scale(1);}
     }
+    
+    /* Popup styling */
+    #popup {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(0);
+      background: #e53935;
+      color: white;
+      padding: 24px 36px;
+      border-radius: 18px;
+      box-shadow: 0 8px 20px rgb(229 57 53 / 0.9);
+      font-weight: 700;
+      font-size: 1.4rem;
+      z-index: 9999;
+      transition: transform 0.3s ease;
+      user-select: none;
+      text-align: center;
+      max-width: 320px;
+    }
+    #popup.show {
+      transform: translate(-50%, -50%) scale(1);
+    }
+    #popup button {
+      margin-top: 16px;
+      background: white;
+      color: #e53935;
+      padding: 8px 18px;
+      border-radius: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 3px 10px rgb(229 57 53 / 0.6);
+      transition: background 0.3s ease;
+    }
+    #popup button:hover {
+      background: #f44336;
+      color: white;
+    }
   </style>
 </head>
 <body>
+  <header>
+    <button id="loginBtn">Log In</button>
+    <button id="signupBtn">Sign Up</button>
+    <button id="logoutBtn" style="display:none; background:#e53935;">Log Out</button>
+  </header>
 
-<header>
-  <button id="loginBtn">Log In</button>
-  <button id="signupBtn">Sign Up</button>
-  <button id="logoutBtn" style="display:none; background:#f44336;">Log Out</button>
-</header>
+  <main>
+    <section id="leftPanel" style="display:flex; flex-direction: column;">
+      <div id="welcomeMsg" style="font-weight:700; font-size:1.2rem; margin-bottom:8px;"></div>
+      <div id="moneyDisplay" style="font-size:1.4rem; color:#4caf50; margin-bottom:6px;"></div>
+      <div id="countdown" style="color:#555; margin-bottom:12px;"></div>
 
-<main>
-  <section id="authForm">
-    <input id="username" placeholder="Username" autocomplete="off" />
-    <input id="password" type="password" placeholder="Password" autocomplete="off" />
-    <button id="submitBtn">Log In</button>
-  </section>
+      <div id="playersList" title="Player List" style="flex-grow:1; overflow-y:auto; border-radius:12px; background:#f7fefa; padding:12px; box-shadow: inset 0 0 12px rgb(76 175 80 / 0.15); max-height:400px;"></div>
+      <button id="banBtn" disabled style="display:none;">Ban Player</button>
 
-  <section id="gamePanel" style="display:none;">
+      <div id="log" style="margin-top: 14px; max-height:200px; overflow-y:auto;"></div>
+    </section>
 
-    <div id="welcomeMsg"></div>
-    <div id="moneyDisplay">Money: $0</div>
-    <div id="countdown">Next $1 in: 30 seconds</div>
+    <section id="gamePanel" style="display:none; flex-direction: column;">
+      <div id="shopTitle" style="font-weight:700; font-size:1.2rem; margin-bottom:8px; color:#2e7d32;">Shop</div>
+      <div id="shop" style="display:flex; flex-direction: column; gap:10px;">
+        <button data-item="Hat" data-price="10">Buy Hat - $10</button>
+        <button data-item="Sword" data-price="25">Buy Sword - $25</button>
+        <button data-item="Shield" data-price="40">Buy Shield - $40</button>
+      </div>
+    </section>
 
-    <div id="playersList" title="Click to select a player (admin only)"></div>
-    <button id="banBtn" disabled>Ban Selected Player</button>
+    <section id="cats" aria-label="Cat pictures">
+      <!-- Cats will appear here -->
+    </section>
+  </main>
 
-    <div id="shop">
-      <div><b>Shop</b></div>
-      <button data-price="5" data-item="Cool Hat">Buy Cool Hat ($5)</button>
-      <button data-price="12" data-item="Magic Sword">Buy Magic Sword ($12)</button>
-      <button data-price="30" data-item="Golden Crown">Buy Golden Crown ($30)</button>
-    </div>
-
-    <div id="log" title="Logs"></div>
-  </section>
-</main>
-
-<section id="cats">
-  <img src="https://cdn2.thecatapi.com/images/MTY3ODIyMQ.jpg" alt="Cat 1" />
-  <img src="https://cdn2.thecatapi.com/images/MTU3ODIyMQ.jpg" alt="Cat 2" />
-  <img src="https://cdn2.thecatapi.com/images/MTY3OTIyNA.jpg" alt="Cat 3" />
-  <img src="https://cdn2.thecatapi.com/images/MTY3ODIyMg.jpg" alt="Cat 4" />
-  <img src="https://cdn2.thecatapi.com/images/MTY3ODIyMw.jpg" alt="Cat 5" />
-</section>
+  <!-- Popup -->
+  <div id="popup">
+    <div>Error: This user is banned</div>
+    <button id="popupClose">Close</button>
+  </div>
 
 <script>
 (() => {
-  // Elements
+  // Data store & state
+  const usersKey = 'moneyGameUsers_v2';
+  const bannedKey = 'moneyGameBanned_v2';
+
+  let users = JSON.parse(localStorage.getItem(usersKey)) || {};
+  let bannedPlayers = JSON.parse(localStorage.getItem(bannedKey)) || [];
+  let currentUser = null;
+  let money = 0;
+  let nextSecond = 30;
+  let moneyInterval = null;
+  let secondTimer = null;
+  let selectedPlayer = null;
+
+  // Cached DOM
   const loginBtn = document.getElementById('loginBtn');
   const signupBtn = document.getElementById('signupBtn');
   const logoutBtn = document.getElementById('logoutBtn');
-  const authForm = document.getElementById('authForm');
-  const submitBtn = document.getElementById('submitBtn');
-  const usernameInput = document.getElementById('username');
-  const passwordInput = document.getElementById('password');
-  const gamePanel = document.getElementById('gamePanel');
+  const banBtn = document.getElementById('banBtn');
   const welcomeMsg = document.getElementById('welcomeMsg');
   const moneyDisplay = document.getElementById('moneyDisplay');
   const countdown = document.getElementById('countdown');
-  const logDiv = document.getElementById('log');
   const playersList = document.getElementById('playersList');
-  const banBtn = document.getElementById('banBtn');
+  const logDiv = document.getElementById('log');
+  const gamePanel = document.getElementById('gamePanel');
   const shop = document.getElementById('shop');
+  const popup = document.getElementById('popup');
+  const popupClose = document.getElementById('popupClose');
+  const catsSection = document.getElementById('cats');
 
-  // Hardcoded users & banned storage keys
-  const STORAGE_USERS = 'moneyGameUsers_v1';
-  const STORAGE_BANNED = 'moneyGameBanned_v1';
+  // Predefined cats URLs
+  const catPics = [
+    'https://cataas.com/cat/cute/says/Hi%20there!',
+    'https://cataas.com/cat/sleepy',
+    'https://cataas.com/cat/funny',
+    'https://cataas.com/cat/smile',
+    'https://cataas.com/cat/angry',
+    'https://cataas.com/cat/cat',
+    'https://cataas.com/cat/whiskers',
+    'https://cataas.com/cat/meow',
+    'https://cataas.com/cat/eyes',
+    'https://cataas.com/cat/happy',
+  ];
 
-  // Defaults
-  let users = {
-    cow: { password: 'cow', money: 0, items: [] },
-    admin: { password: 'admin', money: 1000, items: [] },
-  };
-  let bannedPlayers = [];
-
-  // Load from localStorage
-  function loadStorage() {
-    const storedUsers = localStorage.getItem(STORAGE_USERS);
-    const storedBanned = localStorage.getItem(STORAGE_BANNED);
-    if (storedUsers) {
-      try {
-        users = JSON.parse(storedUsers);
-      } catch {}
-    }
-    if (storedBanned) {
-      try {
-        bannedPlayers = JSON.parse(storedBanned);
-      } catch {}
-    }
+  // Initialize admin account
+  if (!users.admin) {
+    users.admin = { password: 'admin', money: 0, items: [] };
+    saveStorage();
   }
+
+  // Save data
   function saveStorage() {
-    localStorage.setItem(STORAGE_USERS, JSON.stringify(users));
-    localStorage.setItem(STORAGE_BANNED, JSON.stringify(bannedPlayers));
+    localStorage.setItem(usersKey, JSON.stringify(users));
+    localStorage.setItem(bannedKey, JSON.stringify(bannedPlayers));
   }
 
-  // Variables
-  let currentUser = null;
-  let money = 0;
-  let moneyInterval = null;
-  let secondTimer = null;
-  let nextSecond = 30;
-  let selectedPlayer = null;
+  // Logging utility
   let logs = [];
-
-  // Log helper
   function log(msg) {
-    const time = new Date().toLocaleTimeString();
-    logs.push(`[${time}] ${msg}`);
-    if (logs.length > 30) logs.shift();
-    logDiv.innerHTML = logs.map(l => `<div>${l}</div>`).join('');
+    const timestamp = new Date().toLocaleTimeString();
+    logs.push(`[${timestamp}] ${msg}`);
+    if (logs.length > 50) logs.shift(); // keep last 50 logs
+    renderLogs();
+  }
+  function renderLogs() {
+    logDiv.innerHTML = '';
+    logs.forEach(text => {
+      const d = document.createElement('div');
+      d.textContent = text;
+      logDiv.appendChild(d);
+    });
     logDiv.scrollTop = logDiv.scrollHeight;
   }
 
-  // Update money display
+  // Money and countdown update
   function updateMoney() {
     moneyDisplay.textContent = `Money: $${money}`;
   }
-
-  // Update countdown display
   function updateCountdown() {
-    countdown.textContent = `Next $1 in: ${nextSecond} second${nextSecond !== 1 ? 's' : ''}`;
+    countdown.textContent = `Next $1 in: ${nextSecond}s`;
   }
 
-  // Start money timer + countdown
+  // Start timers for earning money
   function startMoneyTimers() {
+    updateCountdown();
     if (moneyInterval) clearInterval(moneyInterval);
     if (secondTimer) clearInterval(secondTimer);
-
-    nextSecond = 30;
-    updateCountdown();
 
     secondTimer = setInterval(() => {
       nextSecond--;
@@ -386,22 +404,24 @@
     }, 30000);
   }
 
-  // Show players list
+  // Render players list
   function renderPlayersList() {
     playersList.innerHTML = '';
     Object.keys(users).forEach(user => {
-      if (bannedPlayers.includes(user)) return; // skip banned in list
+      if (bannedPlayers.includes(user)) return; // skip banned
       const div = document.createElement('div');
       div.textContent = user + (user === currentUser ? " (You)" : "");
       if (user === selectedPlayer) div.classList.add('selected');
       div.title = users[user].items.length > 0 ? `Items: ${users[user].items.join(', ')}` : "No items";
-      div.onclick = () => {
-        if (currentUser !== 'admin') return;
-        if (user === currentUser) return; // can't select self
-        selectedPlayer = user;
-        renderPlayersList();
-        banBtn.disabled = !selectedPlayer;
-      };
+      if (currentUser === 'admin') {
+        div.style.cursor = 'pointer';
+        div.onclick = () => {
+          if (user === currentUser) return; // can't select self
+          selectedPlayer = user;
+          renderPlayersList();
+          banBtn.disabled = !selectedPlayer;
+        };
+      }
       playersList.appendChild(div);
     });
   }
@@ -409,143 +429,162 @@
   // Ban player function
   function banSelectedPlayer() {
     if (!selectedPlayer) return;
-    if (!confirm(`Are you sure you want to ban player "${selectedPlayer}"? This will log them out.`)) return;
+    if (!confirm(`Ban player "${selectedPlayer}"? They will be logged out and banned.`)) return;
 
     bannedPlayers.push(selectedPlayer);
     delete users[selectedPlayer];
     saveStorage();
-    log(`Player "${selectedPlayer}" was banned by admin!`);
+    log(`Player "${selectedPlayer}" was banned by admin.`);
     selectedPlayer = null;
     banBtn.disabled = true;
     renderPlayersList();
+
+    // Force logout banned user if online
+    if (currentUser === selectedPlayer) {
+      logout();
+      showPopup('Error: This user is banned');
+    }
   }
 
-  // Show auth form or game
-  function showAuth() {
-    authForm.style.display = 'flex';
-    gamePanel.style.display = 'none';
-    logoutBtn.style.display = 'none';
-    loginBtn.style.display = 'inline-flex';
-    signupBtn.style.display = 'inline-flex';
-    usernameInput.value = '';
-    passwordInput.value = '';
-    usernameInput.focus();
-    selectedPlayer = null;
-    banBtn.disabled = true;
+  // Show popup
+  function showPopup(message) {
+    popup.querySelector('div').textContent = message;
+    popup.classList.add('show');
+  }
+  popupClose.onclick = () => {
+    popup.classList.remove('show');
+  };
+
+  // Login/signup form popup simplified to prompt dialogs
+  async function handleLogin() {
+    let user = prompt('Enter username:');
+    if (!user) return;
+    if (bannedPlayers.includes(user)) {
+      showPopup('Error: This user is banned');
+      return;
+    }
+    let pass = prompt('Enter password:');
+    if (!pass) return;
+    if (!users[user]) {
+      alert('User does not exist.');
+      return;
+    }
+    if (users[user].password !== pass) {
+      alert('Incorrect password.');
+      return;
+    }
+    currentUser = user;
+    startGame();
   }
 
-  function showGame() {
-    authForm.style.display = 'none';
-    gamePanel.style.display = 'flex';
-    logoutBtn.style.display = 'inline-flex';
+  async function handleSignup() {
+    let user = prompt('Choose username:');
+    if (!user) return;
+    if (users[user]) {
+      alert('Username taken.');
+      return;
+    }
+    if (bannedPlayers.includes(user)) {
+      showPopup('Error: This user is banned');
+      return;
+    }
+    let pass = prompt('Choose password:');
+    if (!pass) return;
+    users[user] = { password: pass, money: 0, items: [] };
+    saveStorage();
+    alert('Sign up successful. Please log in.');
+  }
+
+  // Start the game UI after login
+  function startGame() {
     loginBtn.style.display = 'none';
     signupBtn.style.display = 'none';
+    logoutBtn.style.display = 'inline-flex';
+    gamePanel.style.display = 'flex';
     welcomeMsg.textContent = `Welcome, ${currentUser}!`;
     money = users[currentUser].money || 0;
     updateMoney();
     renderPlayersList();
     banBtn.disabled = true;
+
     if (currentUser === 'admin') {
       banBtn.style.display = 'block';
-      playersList.title = 'Click to select a player (admin only)';
+      playersList.title = 'Click a player to select and ban (admin only)';
     } else {
       banBtn.style.display = 'none';
-      playersList.title = 'Player list';
+      playersList.title = 'Player List';
     }
+
     startMoneyTimers();
     logs = [];
-    log(`Logged in as ${currentUser}`);
+    log(`Logged in as "${currentUser}".`);
+
+    // Reset selected player
+    selectedPlayer = null;
+
+    // Shop buy handlers
+    shop.querySelectorAll('button').forEach(btn => {
+      btn.onclick = () => {
+        const price = Number(btn.dataset.price);
+        const item = btn.dataset.item;
+        if (money < price) {
+          log(`Not enough money to buy ${item}.`);
+          return;
+        }
+        money -= price;
+        users[currentUser].money = money;
+        users[currentUser].items.push(item);
+        saveStorage();
+        updateMoney();
+        log(`Bought ${item} for $${price}.`);
+      };
+    });
   }
 
-  // Login or Signup mode toggle
-  let isSignupMode = false;
-
-  // Event Listeners
-  loginBtn.onclick = () => {
-    isSignupMode = false;
-    submitBtn.textContent = 'Log In';
-    showAuth();
-  };
-  signupBtn.onclick = () => {
-    isSignupMode = true;
-    submitBtn.textContent = 'Sign Up';
-    showAuth();
-  };
-  logoutBtn.onclick = () => {
-    if (moneyInterval) clearInterval(moneyInterval);
-    if (secondTimer) clearInterval(secondTimer);
+  // Logout function
+  function logout() {
     currentUser = null;
-    saveStorage();
-    showAuth();
+    money = 0;
+    nextSecond = 30;
+    clearInterval(moneyInterval);
+    clearInterval(secondTimer);
+    moneyInterval = null;
+    secondTimer = null;
+    gamePanel.style.display = 'none';
+    loginBtn.style.display = 'inline-flex';
+    signupBtn.style.display = 'inline-flex';
+    logoutBtn.style.display = 'none';
+    welcomeMsg.textContent = '';
+    moneyDisplay.textContent = '';
+    countdown.textContent = '';
+    playersList.innerHTML = '';
     logDiv.innerHTML = '';
+    banBtn.disabled = true;
+    banBtn.style.display = 'none';
+  }
+
+  // Ban button click
+  banBtn.onclick = () => {
+    banSelectedPlayer();
   };
 
-  submitBtn.onclick = () => {
-    const user = usernameInput.value.trim();
-    const pass = passwordInput.value.trim();
-    if (!user || !pass) {
-      alert('Please enter username and password!');
-      return;
-    }
-    if (bannedPlayers.includes(user)) {
-      alert('This user is banned!');
-      return;
-    }
-    if (isSignupMode) {
-      if (users[user]) {
-        alert('User already exists!');
-        return;
-      }
-      users[user] = { password: pass, money: 0, items: [] };
-      saveStorage();
-      alert('Sign up successful! Please log in.');
-      isSignupMode = false;
-      submitBtn.textContent = 'Log In';
-      usernameInput.value = '';
-      passwordInput.value = '';
-      usernameInput.focus();
-      return;
-    } else {
-      if (!users[user]) {
-        alert('User does not exist!');
-        return;
-      }
-      if (users[user].password !== pass) {
-        alert('Incorrect password!');
-        return;
-      }
-      currentUser = user;
-      showGame();
-    }
-  };
+  // Button handlers
+  loginBtn.onclick = handleLogin;
+  signupBtn.onclick = handleSignup;
+  logoutBtn.onclick = logout;
 
-  banBtn.onclick = banSelectedPlayer;
-
-  // Shop Buy Buttons
-  shop.querySelectorAll('button[data-price]').forEach(btn => {
-    btn.onclick = () => {
-      if (!currentUser) return;
-      const price = parseInt(btn.dataset.price, 10);
-      const item = btn.dataset.item;
-      if (money < price) {
-        alert(`You don't have enough money to buy ${item}!`);
-        return;
-      }
-      money -= price;
-      users[currentUser].money = money;
-      if (!users[currentUser].items) users[currentUser].items = [];
-      users[currentUser].items.push(item);
-      saveStorage();
-      updateMoney();
-      log(`Bought "${item}" for $${price}`);
-      // Optionally disable button if bought once:
-      // btn.disabled = true;
-    };
-  });
-
-  // Initial load
-  loadStorage();
-  showAuth();
+  // Show random cat pics every 10 seconds
+  function showCats() {
+    catsSection.innerHTML = '';
+    for(let i=0; i<3; i++){
+      const img = document.createElement('img');
+      img.src = catPics[Math.floor(Math.random() * catPics.length)] + `?t=${Date.now()}`;
+      img.alt = "Cute cat picture";
+      catsSection.appendChild(img);
+    }
+  }
+  showCats();
+  setInterval(showCats, 10000);
 
 })();
 </script>
