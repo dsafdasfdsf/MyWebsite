@@ -6,24 +6,28 @@
 <title>Simple Money Game</title>
 <style>
   :root{
-    --blue:#2d89ef; --green:#28a745; --red:#dc3545; --muted:#6c757d;
+    --blue:#2d89ef; --green:#28a745; --red:#dc3545; --gold:#ffc107; --muted:#6c757d;
     --bg:#ffffff; --card:#ffffff; --border:#e9e9e9;
+    --success:#2ecc71; --error:#e74c3c;
   }
   html,body{height:100%;margin:0;background:var(--bg);color:#111;font-family:system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial;}
   header{max-width:1100px;margin:16px auto;padding:12px 18px;display:flex;align-items:center;justify-content:space-between;background:var(--card);border-radius:10px;border:1px solid var(--border);box-shadow:0 2px 8px rgba(0,0,0,0.03)}
   header h1{font-size:18px;margin:0;font-weight:700}
   .top-buttons{display:flex;gap:10px;align-items:center}
-  button{cursor:pointer;border:0;padding:8px 12px;border-radius:10px;font-weight:700}
-  .btn-blue{background:var(--blue);color:white}
-  .btn-green{background:var(--green);color:white}
-  .btn-red{background:var(--red);color:white}
-  .btn-muted{background:var(--muted);color:white}
+  button{cursor:pointer;border:0;padding:8px 12px;border-radius:10px;font-weight:700;transition:transform .12s ease,box-shadow .12s ease}
+  button:active{transform:translateY(1px)}
+  .btn-blue{background:var(--blue);color:white;box-shadow:0 6px 18px rgba(45,137,239,0.14)}
+  .btn-green{background:var(--green);color:white;box-shadow:0 6px 18px rgba(40,167,69,0.14)}
+  .btn-red{background:var(--red);color:white;box-shadow:0 6px 18px rgba(220,53,69,0.14)}
+  .btn-muted{background:var(--muted);color:white;box-shadow:0 6px 18px rgba(108,117,125,0.12)}
+  .btn-gold{background:var(--gold);color:#111}
+
   main{max-width:1100px;margin:18px auto;padding:18px;background:var(--card);border-radius:12px;border:1px solid var(--border);box-shadow:0 6px 20px rgba(0,0,0,0.03);display:grid;grid-template-columns:1fr 420px;gap:18px}
   .game-area{display:flex;flex-direction:column;gap:12px}
   .panel{background:#fff;border:1px solid var(--border);border-radius:10px;padding:12px;box-shadow:0 2px 6px rgba(0,0,0,0.02)}
   #moneyDisplay{font-size:20px;font-weight:800}
   #timer{color:#666;font-weight:600}
-  #floatingBall{position:absolute;width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,#007bff,#00d4ff);box-shadow:0 6px 22px rgba(0,140,255,0.12);cursor:pointer;display:none;z-index:50;pointer-events:auto}
+  #floatingBall{position:absolute;width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,#007bff,#00d4ff);box-shadow:0 6px 22px rgba(0,140,255,0.12);cursor:pointer;display:none;z-index:50;pointer-events:auto;transform:translate(0,0)}
   .admin-col{display:flex;flex-direction:column;gap:12px}
   .players-list{height:420px;overflow:auto;padding:8px;border-radius:8px;border:1px solid var(--border);background:#fff;font-family:monospace}
   .players-row{display:flex;align-items:center;justify-content:space-between;padding:8px;border-bottom:1px solid #f5f5f5}
@@ -38,6 +42,25 @@
   .modal input{width:100%;padding:10px;margin:8px 0;border-radius:8px;border:1px solid #ddd}
   .small{font-size:13px;color:#666}
   footer{max-width:1100px;margin:18px auto;text-align:center;color:#777;font-size:13px}
+
+  /* popups */
+  #popup{position:fixed;left:50%;top:22px;transform:translateX(-50%) translateY(-10px);min-width:220px;padding:10px 16px;border-radius:10px;color:white;display:none;z-index:1400;box-shadow:0 8px 30px rgba(0,0,0,0.12);opacity:0}
+  @keyframes popupIn { from{transform:translateX(-50%) translateY(-18px);opacity:0} to{transform:translateX(-50%) translateY(0);opacity:1} }
+  @keyframes popupOut { from{transform:translateX(-50%) translateY(0);opacity:1} to{transform:translateX(-50%) translateY(-18px);opacity:0} }
+  .popup-success{background:var(--success)}
+  .popup-error{background:var(--error); animation: shake .42s; }
+  @keyframes shake { 10%,90%{transform:translateX(-50%) translateX(-2px)} 20%,80%{transform:translateX(-50%) translateX(4px)} 30%,50%,70%{transform:translateX(-50%) translateX(-8px)} 40%,60%{transform:translateX(-50%) translateX(8px)} }
+
+  /* Shop layout */
+  .shop-grid{display:flex;gap:12px;flex-wrap:wrap}
+  .shop-item{border:1px solid var(--border);padding:10px;border-radius:10px;width:160px;text-align:center;transition:transform .15s ease}
+  .shop-item:hover{transform:translateY(-6px)}
+  .shop-item h4{margin:8px 0}
+  .shop-item .price{font-weight:800;color:#333;margin-bottom:8px}
+
+  /* subtle animations for buttons */
+  .btn-animated{transition:transform .12s ease,box-shadow .12s ease}
+  .btn-animated:hover{transform:translateY(-4px)}
   @media (max-width:940px){main{grid-template-columns:1fr;}.admin-col{order:2}}
 </style>
 </head>
@@ -46,10 +69,10 @@
 <header>
   <h1>Simple Money Game</h1>
   <div class="top-buttons">
-    <button id="shopBtn" class="btn-blue" title="Shop (placeholder)">Shop</button>
-    <button id="loginBtn" class="btn-blue">Log In</button>
-    <button id="signupBtn" class="btn-green">Sign Up</button>
-    <button id="logoutBtn" class="btn-muted" style="display:none">Log Out</button>
+    <button id="shopBtn" class="btn-blue btn-animated" title="Open shop">Shop</button>
+    <button id="loginBtn" class="btn-blue btn-animated">Log In</button>
+    <button id="signupBtn" class="btn-green btn-animated">Sign Up</button>
+    <button id="logoutBtn" class="btn-muted btn-animated" style="display:none">Log Out</button>
   </div>
 </header>
 
@@ -72,8 +95,14 @@
     <div class="panel">
       <div style="font-weight:700;margin-bottom:8px">Account</div>
       <div id="accountSection" class="small">Not logged in</div>
-      <div id="accountActions" style="margin-top:10px"></div>
+      <div id="accountActions" style="margin-top:12px"></div>
     </div>
+
+    <div id="shopPanel" class="panel" style="display:none;">
+      <div style="font-weight:700;margin-bottom:8px">Shop — buy items (persisted)</div>
+      <div class="shop-grid" id="shopGrid"></div>
+    </div>
+
   </section>
 
   <aside class="admin-col">
@@ -95,10 +124,10 @@
         <input id="adminAmount" type="number" placeholder="+amount" />
       </div>
       <div style="display:flex;gap:8px">
-        <button id="giveBtn" class="btn-green">Give</button>
-        <button id="banBtn" class="btn-red">Ban</button>
-        <button id="unbanBtn" style="background:#ffc107;color:#111;border-radius:10px">Unban</button>
-        <button id="delBtn" style="background:#6c757d;color:white;border-radius:10px">Delete</button>
+        <button id="giveBtn" class="btn-green btn-animated">Give</button>
+        <button id="banBtn" class="btn-red btn-animated">Ban</button>
+        <button id="unbanBtn" class="btn-gold btn-animated">Unban</button>
+        <button id="delBtn" class="btn-muted btn-animated">Delete</button>
       </div>
     </div>
 
@@ -115,8 +144,8 @@
   <input id="loginUser" placeholder="Username" autocapitalize="off" />
   <input id="loginPass" placeholder="Password" type="password" />
   <div style="display:flex;gap:8px">
-    <button id="loginSubmit" class="btn-blue">Log In</button>
-    <button id="loginCancel" class="btn-muted">Cancel</button>
+    <button id="loginSubmit" class="btn-blue btn-animated">Log In</button>
+    <button id="loginCancel" class="btn-muted btn-animated">Cancel</button>
   </div>
 </div></div>
 
@@ -125,49 +154,27 @@
   <input id="signupUser" placeholder="Choose username" />
   <input id="signupPass" placeholder="Choose password" type="password" />
   <div style="display:flex;gap:8px">
-    <button id="signupSubmit" class="btn-green">Sign Up</button>
-    <button id="signupCancel" class="btn-muted">Cancel</button>
+    <button id="signupSubmit" class="btn-green btn-animated">Sign Up</button>
+    <button id="signupCancel" class="btn-muted btn-animated">Cancel</button>
   </div>
 </div></div>
 
-<div id="popup" style="position:fixed;left:50%;top:20px;transform:translateX(-50%);display:none;background:var(--red);color:#fff;padding:10px 14px;border-radius:8px;z-index:1300"></div>
+<div id="popup"></div>
 
-<footer>Simple Money Game — local demo. Passwords hashed with SHA-256 in-browser.</footer>
+<footer>Simple Money Game — demo. Passwords hashed (SHA-256 salted) and purchases encrypted client-side (AES-GCM) using a key derived from your password.</footer>
 
 <script>
-/* -------------- Optimized Single-file App -------------- */
+/* -------------------------- Single-file app -------------------------- */
 
 /* Storage keys */
-const KEY_USERS = 'smg_users_v2';
-const KEY_LOGS  = 'smg_logs_v2';
-const KEY_SESSION = 'smg_session_v2';
+const KEY_USERS = 'smg_users_secure_v1';   // stores { username: { salt, hash, money, isAdmin, banned, encPurchases } }
+const KEY_LOGS  = 'smg_logs_secure_v1';
+const KEY_SESSION = 'smg_session_v1';      // stores session { username, isAdmin }
 
-/* Small helpers */
+/* Basic DOM helper */
 const $ = s => document.querySelector(s);
-const now = () => performance.now();
 
-/* Crypto: SHA-256 hashing (returns hex) */
-async function hashPassword(p){
-  const enc = new TextEncoder().encode(p);
-  const digest = await crypto.subtle.digest('SHA-256', enc);
-  return Array.from(new Uint8Array(digest)).map(b=>b.toString(16).padStart(2,'0')).join('');
-}
-
-/* Load persisted state */
-let users = JSON.parse(localStorage.getItem(KEY_USERS) || '{}');
-let logs  = JSON.parse(localStorage.getItem(KEY_LOGS)  || '[]');
-
-/* Ensure default admin 'cow' exists (hash computed at runtime) */
-(async ()=> {
-  if(!users['cow']){
-    users['cow'] = { hash: await hashPassword('cow'), money:0, isAdmin:true, banned:false };
-    localStorage.setItem(KEY_USERS, JSON.stringify(users));
-    logs.unshift(`[${new Date().toLocaleTimeString()}] Default admin 'cow' created`);
-    localStorage.setItem(KEY_LOGS, JSON.stringify(logs));
-  }
-})();
-
-/* Cached DOM */
+/* DOM refs */
 const moneyDisplay = $('#moneyDisplay');
 const timerDisplay = $('#timer');
 const playersDiv = $('#players');
@@ -203,35 +210,107 @@ const delBtn = $('#delBtn');
 const floatingBall = $('#floatingBall');
 const ballArea = $('#ballArea');
 const accountSection = $('#accountSection');
+const shopPanel = $('#shopPanel');
+const shopGrid = $('#shopGrid');
 
-/* State */
-let currentUser = null;       // { username, isAdmin, money }
+/* App state */
+let users = JSON.parse(localStorage.getItem(KEY_USERS) || '{}');
+let logs = JSON.parse(localStorage.getItem(KEY_LOGS) || '[]');
+let currentUser = null;        // { username, isAdmin, money }
 let secondsLeft = 30;
 let saveTimer = null;
+let sessionEncKey = null;      // CryptoKey for AES-GCM, available only during session (derived from password)
 
-/* Debounced save to localStorage */
+/* ----- crypto helpers ----- */
+// convert ArrayBuffer <-> hex/base64
+const toHex = buf => Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
+const fromHex = hex => {
+  const bytes = new Uint8Array(hex.length/2);
+  for(let i=0;i<bytes.length;i++) bytes[i]=parseInt(hex.substr(i*2,2),16);
+  return bytes.buffer;
+};
+const toBase64 = buf => btoa(String.fromCharCode(...new Uint8Array(buf)));
+const fromBase64 = str => {
+  const bin = atob(str);
+  const arr = new Uint8Array(bin.length);
+  for(let i=0;i<bin.length;i++) arr[i] = bin.charCodeAt(i);
+  return arr.buffer;
+};
+
+// SHA-256(salt + password) -> hex
+async function hashWithSaltHex(saltBase64, password){
+  const saltBuf = fromBase64(saltBase64);
+  const passBuf = new TextEncoder().encode(password);
+  const combined = new Uint8Array(saltBuf.byteLength + passBuf.byteLength);
+  combined.set(new Uint8Array(saltBuf), 0);
+  combined.set(passBuf, saltBuf.byteLength);
+  const digest = await crypto.subtle.digest('SHA-256', combined);
+  return toHex(digest);
+}
+
+// derive AES-GCM key via PBKDF2 from password + salt => CryptoKey
+async function deriveKeyFromPassword(password, saltBase64){
+  const salt = fromBase64(saltBase64);
+  const passKey = await crypto.subtle.importKey('raw', new TextEncoder().encode(password), {name:'PBKDF2'}, false, ['deriveKey']);
+  const key = await crypto.subtle.deriveKey({
+    name: 'PBKDF2',
+    salt,
+    iterations: 120000,
+    hash: 'SHA-256'
+  }, passKey, { name: 'AES-GCM', length: 256 }, false, ['encrypt','decrypt']);
+  return key;
+}
+
+// AES-GCM encrypt object -> base64 iv + ':' + base64 ciphertext
+async function encryptObject(key, obj){
+  const iv = crypto.getRandomValues(new Uint8Array(12));
+  const plain = new TextEncoder().encode(JSON.stringify(obj));
+  const ct = await crypto.subtle.encrypt({ name: 'AES-GCM', iv }, key, plain);
+  return `${toBase64(iv)}:${toBase64(ct)}`;
+}
+// decrypt
+async function decryptObject(key, payload){
+  try{
+    const [ivB64, ctB64] = payload.split(':');
+    const iv = fromBase64(ivB64);
+    const ct = fromBase64(ctB64);
+    const plainBuf = await crypto.subtle.decrypt({ name:'AES-GCM', iv:new Uint8Array(iv) }, key, ct);
+    return JSON.parse(new TextDecoder().decode(plainBuf));
+  }catch(e){
+    return null;
+  }
+}
+
+/* ----- ensure default admin exists ----- */
+(async function ensureAdmin(){
+  if(!users['cow']){
+    const salt = toBase64(crypto.getRandomValues(new Uint8Array(16)));
+    const hash = await hashWithSaltHex(salt, 'cow');
+    users['cow'] = { salt, hash, money:0, isAdmin:true, banned:false, encPurchases: null };
+    scheduleSave();
+    addLog("Default admin 'cow' created");
+  }
+})();
+
+/* ----- persistence with debounce ----- */
 function scheduleSave(){
   if(saveTimer) clearTimeout(saveTimer);
   saveTimer = setTimeout(()=>{
-    try {
-      localStorage.setItem(KEY_USERS, JSON.stringify(users));
-      localStorage.setItem(KEY_LOGS, JSON.stringify(logs));
-    } catch(e){
-      console.warn('Save failed', e);
-    }
+    localStorage.setItem(KEY_USERS, JSON.stringify(users));
+    localStorage.setItem(KEY_LOGS, JSON.stringify(logs));
     saveTimer = null;
   }, 600);
 }
 
-/* Logging */
-function addLog(text){
-  logs.unshift(`[${new Date().toLocaleTimeString()}] ${text}`);
-  if(logs.length>500) logs.length = 500;
+/* ----- logging ----- */
+function addLog(txt){
+  logs.unshift(`[${new Date().toLocaleTimeString()}] ${txt}`);
+  if(logs.length > 500) logs.length = 500;
   renderLogs();
   scheduleSave();
 }
 
-/* Render players (batched) */
+/* ----- UI rendering ----- */
 function renderPlayers(){
   const frag = document.createDocumentFragment();
   const names = Object.keys(users).sort((a,b)=>a.localeCompare(b));
@@ -239,25 +318,26 @@ function renderPlayers(){
     const usr = users[u];
     const row = document.createElement('div');
     row.className = 'players-row';
-
     const left = document.createElement('div');
     left.innerHTML = `<div class="player-name">${u}${usr.isAdmin? ' (admin)':''}</div><div class="small">money: $${usr.money}${usr.banned? ' • BANNED':''}</div>`;
-
     const actions = document.createElement('div');
     actions.className = 'player-actions';
 
-    const btnGive = document.createElement('button'); btnGive.textContent = '+5'; btnGive.className='btn-green';
-    btnGive.addEventListener('click', ()=> adminGive(u,5));
-    actions.appendChild(btnGive);
+    // quick +5
+    const b1 = document.createElement('button'); b1.textContent = '+5'; b1.className='btn-green btn-animated';
+    b1.addEventListener('click', ()=> { if(!currentUser?.isAdmin) return showPopup('Admin only', 'error'); adminGive(u,5); });
+    actions.appendChild(b1);
 
-    const btnBan = document.createElement('button'); btnBan.textContent = usr.banned? 'Unban':'Ban';
-    if(!usr.banned) btnBan.className='btn-red';
-    btnBan.addEventListener('click', ()=> usr.banned ? adminUnban(u) : adminBan(u));
-    actions.appendChild(btnBan);
+    // ban/unban
+    const b2 = document.createElement('button'); b2.textContent = usr.banned? 'Unban':'Ban';
+    if(!usr.banned) b2.className='btn-red btn-animated';
+    b2.addEventListener('click', ()=> { if(!currentUser?.isAdmin) return showPopup('Admin only','error'); usr.banned? adminUnban(u) : adminBan(u); });
+    actions.appendChild(b2);
 
-    const btnDel = document.createElement('button'); btnDel.textContent='Delete'; btnDel.className='btn-muted';
-    btnDel.addEventListener('click', ()=> adminDelete(u));
-    actions.appendChild(btnDel);
+    // delete
+    const b3 = document.createElement('button'); b3.textContent = 'Delete'; b3.className='btn-muted btn-animated';
+    b3.addEventListener('click', ()=> { if(!currentUser?.isAdmin) return showPopup('Admin only','error'); if(!confirm(`Delete ${u}? This cannot be undone.`)) return; adminDelete(u); });
+    actions.appendChild(b3);
 
     row.appendChild(left);
     row.appendChild(actions);
@@ -267,177 +347,269 @@ function renderPlayers(){
   playersDiv.appendChild(frag);
 }
 
-/* Render logs (admin sees them) */
 function renderLogs(){
   logsDiv.innerHTML = '';
-  for(const l of logs.slice(0,200)){
-    const d = document.createElement('div'); d.textContent = l;
+  for(const L of logs.slice(0,200)){
+    const d = document.createElement('div'); d.textContent = L;
     logsDiv.appendChild(d);
   }
 }
 
-/* UI update */
-function renderUI(){
-  moneyDisplay.textContent = currentUser ? `Money: $${currentUser.money}` : 'Money: $0';
-  timerDisplay.textContent = `Next +1 in: ${secondsLeft}s`;
-  accountSection.textContent = currentUser ? `Logged in: ${currentUser.username}${currentUser.isAdmin? ' (admin)':''}` : 'Not logged in';
-  $('#loginBtn').style.display = currentUser ? 'none' : '';
-  $('#signupBtn').style.display = currentUser ? 'none' : '';
-  $('#logoutBtn').style.display = currentUser ? '' : 'none';
-  adminHint.textContent = currentUser?.isAdmin ? 'Admin' : 'Admins only';
-  renderPlayers();
-  renderLogs();
+function renderShop(){
+  shopGrid.innerHTML = '';
+  const items = [
+    { id:'catplush', name:'Cat Plush', price:10, emoji:'🐱' },
+    { id:'speed', name:'Speed Boost', price:25, emoji:'⚡' },
+    { id:'vip', name:'VIP Crown', price:50, emoji:'👑' }
+  ];
+  for(const it of items){
+    const card = document.createElement('div'); card.className='shop-item';
+    card.innerHTML = `<div style="font-size:28px">${it.emoji}</div><h4>${it.name}</h4><div class="price">$${it.price}</div>`;
+    const btn = document.createElement('button'); btn.textContent = 'Buy'; btn.className = 'btn-blue btn-animated';
+    btn.addEventListener('click', ()=> buyItem(it));
+    card.appendChild(btn);
+    shopGrid.appendChild(card);
+  }
 }
 
-/* Session persistence: only username & isAdmin (no password/hash) */
-function saveSession(){
-  if(!currentUser) sessionStorage.removeItem(KEY_SESSION);
-  else sessionStorage.setItem(KEY_SESSION, JSON.stringify({ username: currentUser.username, isAdmin: currentUser.isAdmin }));
-}
-function loadSession(){
-  try{
-    const s = sessionStorage.getItem(KEY_SESSION);
-    if(!s) return;
-    const o = JSON.parse(s);
-    if(o && o.username && users[o.username] && !users[o.username].banned){
-      currentUser = { username:o.username, isAdmin: !!users[o.username].isAdmin, money: users[o.username].money || 0 };
-    } else sessionStorage.removeItem(KEY_SESSION);
-  }catch(e){ sessionStorage.removeItem(KEY_SESSION); }
+/* ----- popup: success / error with animation ----- */
+let popupTimeout = null;
+function showPopup(msg, type='success', ms=2200){
+  clearTimeout(popupTimeout);
+  popupEl.className = '';
+  popupEl.textContent = msg;
+  popupEl.style.display = 'block';
+  popupEl.style.opacity = '1';
+  popupEl.style.animation = 'none';
+  void popupEl.offsetWidth; // reflow
+  popupEl.style.animation = 'popupIn .28s ease forwards';
+  popupEl.classList.add(type==='success' ? 'popup-success' : 'popup-error');
+  popupTimeout = setTimeout(()=> {
+    popupEl.style.animation = 'popupOut .28s ease forwards';
+    setTimeout(()=> { popupEl.style.display = 'none'; popupEl.className = ''; }, 300);
+  }, ms);
 }
 
-/* Auth flows */
-async function attemptSignup(username, password){
-  username = (username||'').trim();
-  if(!username || !password) return showPopup('Enter username & password');
-  if(users[username]) return showPopup('Username exists');
-  const h = await hashPassword(password);
-  users[username] = { hash: h, money: 0, isAdmin: false, banned: false };
-  addLog(`Signup: ${username}`);
+/* keyframe styles injected for popup in JS (so animations defined) */
+const style = document.createElement('style');
+style.textContent = `
+@keyframes popupIn { from { transform: translateY(-12px); opacity: 0 } to { transform: translateY(0); opacity: 1 } }
+@keyframes popupOut { from { transform: translateY(0); opacity: 1 } to { transform: translateY(-12px); opacity: 0 } }
+`;
+document.head.appendChild(style);
+
+/* ----- encryption helpers for purchases ----- */
+/* Each user stores purchases encrypted under key derived from their password.
+   users[username].encPurchases holds "ivBase64:cipherBase64" or null.
+   We keep sessionEncKey (CryptoKey) only while logged in. */
+
+async function saveEncryptedPurchasesFor(username, key, purchasesObj){
+  if(!username || !key) return;
+  const payload = await encryptObject(key, purchasesObj);
+  users[username].encPurchases = payload;
   scheduleSave();
-  showPopup('Sign-up success! Log in now.');
+}
+
+async function loadEncryptedPurchasesFor(username, key){
+  const user = users[username];
+  if(!user || !user.encPurchases) return [];
+  const obj = await decryptObject(key, user.encPurchases);
+  return Array.isArray(obj) ? obj : [];
+}
+
+/* wrapper encryptObject/decryptObject using AES-GCM */
+async function encryptObject(key, obj){
+  const iv = crypto.getRandomValues(new Uint8Array(12));
+  const plain = new TextEncoder().encode(JSON.stringify(obj));
+  const ct = await crypto.subtle.encrypt({ name:'AES-GCM', iv }, key, plain);
+  return `${toBase64(iv)}:${toBase64(ct)}`;
+}
+async function decryptObject(key, payload){
+  try{
+    const [ivB64, ctB64] = payload.split(':');
+    const iv = fromBase64(ivB64);
+    const ct = fromBase64(ctB64);
+    const plainBuf = await crypto.subtle.decrypt({ name:'AES-GCM', iv:new Uint8Array(iv) }, key, ct);
+    return JSON.parse(new TextDecoder().decode(plainBuf));
+  }catch(e){
+    return null;
+  }
+}
+
+/* ----- helpers for base64/hex used above ----- */
+function toBase64(buf){ return btoa(String.fromCharCode(...new Uint8Array(buf))); }
+function fromBase64(str){ const bin = atob(str); const arr = new Uint8Array(bin.length); for(let i=0;i<bin.length;i++) arr[i] = bin.charCodeAt(i); return arr.buffer; }
+
+/* ----- signup/login flows with salt+hash and key derivation ----- */
+async function signup(username, password){
+  username = (username||'').trim();
+  if(!username || !password) return showPopup('Enter username & password','error');
+  if(users[username]) return showPopup('Username exists','error');
+  // generate salt
+  const saltBuf = crypto.getRandomValues(new Uint8Array(16));
+  const salt = toBase64(saltBuf);
+  // hash = SHA-256(salt + password) hex
+  const h = await hashWithSaltHex(salt, password);
+  // store: salt, hash, money, isAdmin:false, banned:false, encPurchases null
+  users[username] = { salt, hash: h, money:0, isAdmin:false, banned:false, encPurchases: null };
+  scheduleSave();
+  addLog(`Signup: ${username}`);
+  showPopup('Sign up successful — please log in', 'success');
   signupBackdrop.style.display = 'none';
 }
 
-async function attemptLogin(username, password){
+async function login(username, password){
   username = (username||'').trim();
-  if(!username || !password) return showPopup('Enter username & password');
-  if(!users[username]) return showPopup('User not found');
-  if(users[username].banned) return showPopup('User is banned');
-  const h = await hashPassword(password);
-  if(h !== users[username].hash) return showPopup('Wrong password');
-  currentUser = { username, isAdmin: !!users[username].isAdmin, money: users[username].money || 0 };
+  if(!username || !password) return showPopup('Enter username & password','error');
+  const u = users[username];
+  if(!u) return showPopup('User not found','error');
+  if(u.banned) return showPopup('This account is banned','error');
+  const h = await hashWithSaltHex(u.salt, password);
+  if(h !== u.hash) return showPopup('Incorrect password','error');
+  // derive session encryption key via PBKDF2 -> AES-GCM
+  sessionEncKey = await deriveKeyFromPassword(password, u.salt);
+  // decrypt purchases to confirm key works (if encPurchases exists)
+  const purchases = u.encPurchases ? (await decryptObject(sessionEncKey, u.encPurchases) || []) : [];
+  currentUser = { username, isAdmin: !!u.isAdmin, money: u.money || 0, purchases: purchases };
   saveSession();
   addLog(`Login: ${username}`);
   loginBackdrop.style.display = 'none';
   renderUI();
+  showPopup('Logged in','success');
 }
 
-/* Logout */
-function logout(){
+function saveSession(){ if(!currentUser) sessionStorage.removeItem(KEY_SESSION); else sessionStorage.setItem(KEY_SESSION, JSON.stringify({ username: currentUser.username, isAdmin: currentUser.isAdmin })); }
+
+async function logout(){
   if(currentUser) addLog(`Logout: ${currentUser.username}`);
   currentUser = null;
+  sessionEncKey = null;
   saveSession();
   renderUI();
+  showPopup('Logged out','success');
 }
 
-/* Admin operations (all mutate users, push logs, schedule save) */
-function adminGive(username, amount){
-  if(!currentUser?.isAdmin) return showPopup('Admin only');
-  if(!users[username]) return showPopup('User not found');
+/* deriveKeyFromPassword implementation (PBKDF2 -> AES-GCM) */
+async function deriveKeyFromPassword(password, saltBase64){
+  const saltBuf = fromBase64(saltBase64);
+  const baseKey = await crypto.subtle.importKey('raw', new TextEncoder().encode(password), 'PBKDF2', false, ['deriveKey']);
+  const key = await crypto.subtle.deriveKey({
+    name: 'PBKDF2',
+    salt: saltBuf,
+    iterations: 120000,
+    hash: 'SHA-256'
+  }, baseKey, { name: 'AES-GCM', length: 256 }, false, ['encrypt','decrypt']);
+  return key;
+}
+
+/* ----- admin functions ----- */
+async function adminGive(username, amount){
+  if(!currentUser?.isAdmin) return showPopup('Admin only','error');
+  if(!users[username]) return showPopup('User not found','error');
   users[username].money = (users[username].money||0) + Number(amount||0);
   addLog(`Admin ${currentUser.username} gave $${amount} to ${username}`);
   scheduleSave();
   if(currentUser.username === username) currentUser.money = users[username].money;
   renderUI();
+  showPopup(`Gave $${amount} to ${username}`, 'success');
 }
-function adminBan(username){
-  if(!currentUser?.isAdmin) return showPopup('Admin only');
-  if(!users[username]) return showPopup('User not found');
+
+async function adminBan(username){
+  if(!currentUser?.isAdmin) return showPopup('Admin only','error');
+  if(!users[username]) return showPopup('User not found','error');
   users[username].banned = true;
   addLog(`Admin ${currentUser.username} banned ${username}`);
   scheduleSave();
-  if(currentUser.username === username){ logout(); saveSession(); }
+  if(currentUser.username === username){ await logout(); showPopup('You were banned','error'); }
   renderUI();
 }
-function adminUnban(username){
-  if(!currentUser?.isAdmin) return showPopup('Admin only');
-  if(!users[username]) return showPopup('User not found');
+async function adminUnban(username){
+  if(!currentUser?.isAdmin) return showPopup('Admin only','error');
+  if(!users[username]) return showPopup('User not found','error');
   users[username].banned = false;
   addLog(`Admin ${currentUser.username} unbanned ${username}`);
   scheduleSave();
   renderUI();
 }
-function adminDelete(username){
-  if(!currentUser?.isAdmin) return showPopup('Admin only');
-  if(!users[username]) return showPopup('User not found');
-  if(username === currentUser.username) return showPopup("Can't delete yourself");
+async function adminDelete(username){
+  if(!currentUser?.isAdmin) return showPopup('Admin only','error');
+  if(!users[username]) return showPopup('User not found','error');
+  if(username === currentUser.username) return showPopup("Can't delete yourself",'error');
   delete users[username];
   addLog(`Admin ${currentUser.username} deleted ${username}`);
   scheduleSave();
   renderUI();
+  showPopup(`Deleted ${username}`, 'success');
 }
 
-/* Quick admin controls wiring */
-giveBtn.addEventListener('click', ()=>{
-  const t = adminTargetInput.value.trim();
-  const a = Number(adminAmountInput.value) || 0;
-  if(!t) return showPopup('Enter target username');
-  adminGive(t,a);
-});
-banBtn.addEventListener('click', ()=> {
-  const t = adminTargetInput.value.trim(); if(!t) return showPopup('Enter target username'); adminBan(t);
-});
-unbanBtn.addEventListener('click', ()=> {
-  const t = adminTargetInput.value.trim(); if(!t) return showPopup('Enter target username'); adminUnban(t);
-});
-delBtn.addEventListener('click', ()=> {
-  const t = adminTargetInput.value.trim(); if(!t) return showPopup('Enter target username'); if(!confirm(`Delete ${t}?`)) return; adminDelete(t);
-});
-
-/* Popup helper */
-let popupTimeout = null;
-function showPopup(msg, ms=2000){
-  popupEl.textContent = msg;
-  popupEl.style.display = 'block';
-  popupEl.style.opacity = '1';
-  clearTimeout(popupTimeout);
-  popupTimeout = setTimeout(()=> {
-    popupEl.style.opacity = '0';
-    setTimeout(()=> popupEl.style.display='none', 300);
-  }, ms);
+/* ----- shop: buy item, encrypt purchases with session key ----- */
+async function buyItem(item){
+  if(!currentUser) return showPopup('Log in to buy items','error');
+  const price = item.price;
+  if(currentUser.money < price) {
+    // red error popup
+    return showPopup('Not enough money','error');
+  }
+  // deduct
+  users[currentUser.username].money -= price;
+  currentUser.money = users[currentUser.username].money;
+  // load purchases, append item, encrypt and store
+  const purchases = currentUser.purchases || [];
+  purchases.push({ id:item.id, name:item.name, price:item.price, boughtAt: new Date().toISOString() });
+  currentUser.purchases = purchases;
+  // encrypt and save to users database
+  if(sessionEncKey){
+    users[currentUser.username].encPurchases = await encryptObject(sessionEncKey, purchases);
+  }
+  addLog(`${currentUser.username} bought ${item.name} for $${price}`);
+  scheduleSave();
+  renderUI();
+  showPopup('Purchase successful', 'success');
 }
 
-/* Login / Signup modal buttons */
-loginBtn.addEventListener('click', ()=> { loginBackdrop.style.display = 'flex'; loginUserEl.focus(); });
-loginCancelBtn.addEventListener('click', ()=> { loginBackdrop.style.display = 'none'; });
-signupBtn.addEventListener('click', ()=> { signupBackdrop.style.display = 'flex'; signupUserEl.focus(); });
-signupCancelBtn.addEventListener('click', ()=> { signupBackdrop.style.display = 'none'; });
-loginSubmitBtn.addEventListener('click', async ()=> {
-  await attemptLogin(loginUserEl.value, loginPassEl.value);
-  loginUserEl.value=''; loginPassEl.value='';
+/* ----- floating ball animation & +5 logic (req login) ----- */
+let ballX=10, ballY=10, ballVX=3*(Math.random()<0.5?-1:1), ballVY=2.5*(Math.random()<0.5?-1:1);
+function placeBall(x,y){ floatingBall.style.transform = `translate(${x}px, ${y}px)`; }
+function startBall(){
+  floatingBall.style.display = 'block';
+  let last = performance.now();
+  function frame(ts){
+    const dt = Math.min(40, ts - last); last = ts;
+    const rect = ballArea.getBoundingClientRect();
+    const w = Math.max(1, rect.width - 60), h = Math.max(1, rect.height - 60);
+    ballX += ballVX * (dt / 16); ballY += ballVY * (dt / 16);
+    if(ballX < 0){ ballX = 0; ballVX = -ballVX; }
+    if(ballY < 0){ ballY = 0; ballVY = -ballVY; }
+    if(ballX > w){ ballX = w; ballVX = -ballVX; }
+    if(ballY > h){ ballY = h; ballVY = -ballVY; }
+    // update absolute position relative to ballArea container
+    const panel = ballArea.getBoundingClientRect();
+    floatingBall.style.left = (panel.left + ballX) + 'px';
+    floatingBall.style.top  = (panel.top + ballY) + 'px';
+    if(Math.random() < 0.009) { ballVX = (Math.random()*6+2)*(Math.random()<0.5?-1:1); ballVY = (Math.random()*6+2)*(Math.random()<0.5?-1:1); }
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+}
+floatingBall.addEventListener('click', (e)=>{
+  e.stopPropagation();
+  if(!currentUser) return showPopup('Log in to collect +5','error');
+  users[currentUser.username].money = (users[currentUser.username].money||0) + 5;
+  currentUser.money = users[currentUser.username].money;
+  addLog(`${currentUser.username} clicked ball +5`);
+  scheduleSave();
+  renderUI();
+  showPopup('+5 received','success');
 });
-signupSubmitBtn.addEventListener('click', async ()=> {
-  await attemptSignup(signupUserEl.value, signupPassEl.value);
-  signupUserEl.value=''; signupPassEl.value='';
-});
-logoutBtn.addEventListener('click', ()=> { logout(); });
 
-shopBtn.addEventListener('click', ()=> showPopup('Shop placeholder (coming soon)', 1400));
-
-/* ----------------- Money tick (single timer) ----------------- */
-let tickLast = performance.now();
+/* ----- money automatic +1 every 30s (single RAF-based timer) ----- */
+let lastTick = performance.now();
 function startTick(){
-  function tick(ts){
-    const delta = ts - tickLast;
-    // handle secondsLeft using delta accumulation
-    // simpler: count with setInterval every 1s, but optimized: do in RAF
-    // Use a micro-timer approach:
-    if(!tickLast) tickLast = ts;
-    const elapsed = Math.floor((ts - tickLast) / 1000);
-    // only decrement by integer seconds passed
-    if(elapsed >= 1){
-      secondsLeft = Math.max(0, secondsLeft - elapsed);
-      tickLast = ts - ((ts - tickLast) % 1000);
+  function loop(ts){
+    const elapsedSec = Math.floor((ts - lastTick) / 1000);
+    if(elapsedSec >= 1){
+      secondsLeft = Math.max(0, secondsLeft - elapsedSec);
+      lastTick = ts - ((ts - lastTick) % 1000);
       if(secondsLeft <= 0){
         secondsLeft = 30;
         if(currentUser){
@@ -445,134 +617,102 @@ function startTick(){
           currentUser.money = users[currentUser.username].money;
           addLog(`${currentUser.username} auto +1`);
           scheduleSave();
+          renderUI();
         }
       }
       renderUI();
     }
-    requestAnimationFrame(tick);
+    requestAnimationFrame(loop);
   }
-  requestAnimationFrame(tick);
+  requestAnimationFrame(loop);
 }
-startTick();
 
-/* -------------- Floating ball optimized animation -------------- */
-/* Ball is positioned relative to ballArea. We'll animate with RAF and simple physics. */
+/* ----- UI and event wiring ----- */
+loginBtn.addEventListener('click', ()=> { loginBackdrop.style.display = 'flex'; loginUserEl.focus(); });
+loginCancelBtn.addEventListener('click', ()=> { loginBackdrop.style.display = 'none'; });
+signupBtn.addEventListener('click', ()=> { signupBackdrop.style.display = 'flex'; signupUserEl.focus(); });
+signupCancelBtn.addEventListener('click', ()=> { signupBackdrop.style.display = 'none'; });
+logoutBtn.addEventListener('click', ()=> { logout(); });
 
-let ballX=20, ballY=20, ballVX=3.5*(Math.random()<0.5?-1:1), ballVY=3*(Math.random()<0.5?-1:1);
-function placeBall(x,y){
-  floatingBall.style.transform = `translate(${x}px, ${y}px)`;
-}
-function startBall(){
-  const areaRect = () => ballArea.getBoundingClientRect();
-  floatingBall.style.display = 'block';
-  let last = performance.now();
-  function frame(t){
-    const dt = Math.min(40, t - last); last = t;
-    const rect = areaRect();
-    const w = Math.max(1, rect.width - 60);
-    const h = Math.max(1, rect.height - 60);
-    ballX += ballVX * (dt / 16);
-    ballY += ballVY * (dt / 16);
-    if(ballX < 0){ ballX = 0; ballVX = -ballVX; }
-    if(ballY < 0){ ballY = 0; ballVY = -ballVY; }
-    if(ballX > w){ ballX = w; ballVX = -ballVX; }
-    if(ballY > h){ ballY = h; ballVY = -ballVY; }
-    placeBall(ballX, ballY);
-    // occasionally randomize speed
-    if(Math.random() < 0.008) { ballVX = (Math.random()*6+2)*(Math.random()<0.5?-1:1); ballVY = (Math.random()*6+2)*(Math.random()<0.5?-1:1); }
-    requestAnimationFrame(frame);
-  }
-  requestAnimationFrame(frame);
-}
-startBall();
-
-/* Click ball to get +5 (login required) */
-floatingBall.addEventListener('click', (e)=>{
-  e.stopPropagation();
-  if(!currentUser) return showPopup('Log in to collect +5');
-  users[currentUser.username].money = (users[currentUser.username].money||0) + 5;
-  currentUser.money = users[currentUser.username].money;
-  addLog(`${currentUser.username} clicked ball +5`);
-  scheduleSave();
-  renderUI();
+loginSubmitBtn.addEventListener('click', async ()=>{
+  await login(loginUserEl.value, loginPassEl.value);
+  loginUserEl.value=''; loginPassEl.value='';
+});
+signupSubmitBtn.addEventListener('click', async ()=>{
+  await signup(signupUserEl.value, signupPassEl.value);
+  signupUserEl.value=''; signupPassEl.value='';
 });
 
-/* Session load on start */
-(function init(){
-  try{
-    const s = sessionStorage.getItem(KEY_SESSION);
-    if(s){
-      const o = JSON.parse(s);
-      if(o.username && users[o.username] && !users[o.username].banned){
-        currentUser = { username:o.username, isAdmin: !!users[o.username].isAdmin, money: users[o.username].money || 0 };
-      } else sessionStorage.removeItem(KEY_SESSION);
-    }
-  }catch(e){ sessionStorage.removeItem(KEY_SESSION); }
-  renderUI();
-})();
-
-/* Expose some actions from quick admin inputs */
-giveBtn.addEventListener('click', ()=>{
+giveBtn.addEventListener('click', ()=> {
   const t = adminTargetInput.value.trim();
   const a = Number(adminAmountInput.value) || 0;
-  if(!t) return showPopup('Enter target username');
+  if(!t) return showPopup('Enter username','error');
+  if(!currentUser?.isAdmin) return showPopup('Admin only','error');
   adminGive(t,a);
 });
-banBtn.addEventListener('click', ()=> { const t = adminTargetInput.value.trim(); if(!t) return showPopup('Enter target username'); adminBan(t); });
-unbanBtn.addEventListener('click', ()=> { const t = adminTargetInput.value.trim(); if(!t) return showPopup('Enter target username'); adminUnban(t); });
-delBtn.addEventListener('click', ()=> { const t = adminTargetInput.value.trim(); if(!t) return showPopup('Enter target username'); if(!confirm(`Delete ${t}?`)) return; adminDelete(t); });
+banBtn.addEventListener('click', ()=> {
+  const t = adminTargetInput.value.trim();
+  if(!t) return showPopup('Enter username','error');
+  if(!currentUser?.isAdmin) return showPopup('Admin only','error');
+  adminBan(t);
+});
+unbanBtn.addEventListener('click', ()=> {
+  const t = adminTargetInput.value.trim();
+  if(!t) return showPopup('Enter username','error');
+  if(!currentUser?.isAdmin) return showPopup('Admin only','error');
+  adminUnban(t);
+});
+delBtn.addEventListener('click', ()=> {
+  const t = adminTargetInput.value.trim();
+  if(!t) return showPopup('Enter username','error');
+  if(!currentUser?.isAdmin) return showPopup('Admin only','error');
+  if(!confirm(`Delete ${t}?`)) return;
+  adminDelete(t);
+});
 
-/* small helper wrappers used in UI (these call admin functions) */
-function adminGive(username, amount){ adminGive_impl(username, amount); }
-function adminBan(username){ adminBan_impl(username); }
-function adminUnban(username){ adminUnban_impl(username); }
-function adminDelete(username){ adminDelete_impl(username); }
+/* quick shop wiring */
+shopBtn.addEventListener('click', ()=>{
+  if(!currentUser) return showPopup('Log in to open shop','error');
+  shopPanel.style.display = shopPanel.style.display === 'none' ? 'block' : 'none';
+});
 
-/* implement wrappers (to avoid hoisting issues) */
-function adminGive_impl(username, amount){
-  if(!currentUser?.isAdmin) return showPopup('Admin only');
-  if(!users[username]) return showPopup('User not found');
-  users[username].money = (users[username].money||0) + Number(amount||0);
-  addLog(`Admin ${currentUser.username} gave $${amount} to ${username}`);
-  scheduleSave();
-  if(currentUser.username === username) currentUser.money = users[username].money;
-  renderUI();
-}
-function adminBan_impl(username){
-  if(!currentUser?.isAdmin) return showPopup('Admin only');
-  if(!users[username]) return showPopup('User not found');
-  users[username].banned = true;
-  addLog(`Admin ${currentUser.username} banned ${username}`);
-  scheduleSave();
-  if(currentUser.username === username){ logout(); saveSession(); }
-  renderUI();
-}
-function adminUnban_impl(username){
-  if(!currentUser?.isAdmin) return showPopup('Admin only');
-  if(!users[username]) return showPopup('User not found');
-  users[username].banned = false;
-  addLog(`Admin ${currentUser.username} unbanned ${username}`);
-  scheduleSave();
-  renderUI();
-}
-function adminDelete_impl(username){
-  if(!currentUser?.isAdmin) return showPopup('Admin only');
-  if(!users[username]) return showPopup('User not found');
-  if(username === currentUser.username) return showPopup("Can't delete yourself");
-  delete users[username];
-  addLog(`Admin ${currentUser.username} deleted ${username}`);
-  scheduleSave();
-  renderUI();
-}
-
-/* Save session helper */
-function saveSession(){ if(!currentUser) sessionStorage.removeItem(KEY_SESSION); else sessionStorage.setItem(KEY_SESSION, JSON.stringify({ username: currentUser.username, isAdmin: currentUser.isAdmin })); }
-
-/* Hook final: render loop keeps UI current */
-(function renderLoop(){
-  renderUI();
-  requestAnimationFrame(renderLoop);
+/* load session (no password) — only username/isAdmin */
+(function loadSession(){
+  try{
+    const s = sessionStorage.getItem(KEY_SESSION);
+    if(!s) return;
+    const obj = JSON.parse(s);
+    if(obj && obj.username && users[obj.username] && !users[obj.username].banned){
+      // we still need the password to derive sessionEncKey — request password on login again to decrypt purchases when needed
+      currentUser = { username: obj.username, isAdmin: !!users[obj.username].isAdmin, money: users[obj.username].money || 0, purchases: null };
+      // sessionEncKey stays null until user logs in with password; purchases remain encrypted until then
+    } else {
+      sessionStorage.removeItem(KEY_SESSION);
+    }
+  }catch(e){ sessionStorage.removeItem(KEY_SESSION); }
 })();
+
+/* helper to render UI (players/logs/shop display) */
+function renderUI(){
+  moneyDisplay.textContent = currentUser ? `Money: $${currentUser.money}` : 'Money: $0';
+  timerDisplay.textContent = `Next +1 in: ${secondsLeft}s`;
+  accountSection.textContent = currentUser ? `Logged in: ${currentUser.username}${currentUser.isAdmin ? ' (admin)' : ''}` : 'Not logged in';
+  $('#loginBtn').style.display = currentUser ? 'none' : '';
+  $('#signupBtn').style.display = currentUser ? 'none' : '';
+  $('#logoutBtn').style.display = currentUser ? '' : 'none';
+  adminHint.textContent = currentUser?.isAdmin ? 'Admin' : 'Admins only';
+  renderPlayers();
+  renderLogs();
+  renderShop();
+}
+
+/* bootstrap */
+renderUI();
+startTick();
+startBall();
+
+/* Expose helper functions so inner handlers can call them (needed due to hoisting) */
+window.buyItem = buyItem; // for debugging if needed
 
 </script>
 </body>
